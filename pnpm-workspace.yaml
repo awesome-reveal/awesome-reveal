@@ -12,7 +12,7 @@ catalog:
   "@types/react-dom": ^19.3.0
   astro: ^7.3.8
   next: ^16.4.0
-  react: ^19.3.0
-  react-dom: ^19.3.0
+  react: ^19.3.1
+  react-dom: ^19.3.1
   vite: ^8.3.4
   vue: ^3.5.43
