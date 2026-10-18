@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "prepare": "husky",
-    "test": "vitest run --project \"*:unit\" --project \"*:ssr\" --project \"*:browser\"",
+    "test": "vitest run --project \"*:unit\" --project \"*:ssr\" --project \"*:browser\" --project \"*:e2e\"",
     "test:package": "pnpm build && vitest run --project \"*:package\" && pnpm --filter \"./packages/*\" --parallel check:package",
     "test:watch": "vitest --project \"*:unit\""
   },

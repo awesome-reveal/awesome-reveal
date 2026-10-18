@@ -221,7 +221,13 @@ export default defineConfig({
           environment: "jsdom",
           setupFiles: ["./test/setup/console.ts", "./test/setup/dom.ts"],
           include: ["test/**/*.test.ts"],
-          exclude: ["test/package/**", "test/e2e/**", "test/ssr.test.ts", "test/build.test.ts"],
+          exclude: [
+            "test/package/**",
+            "test/e2e/**",
+            "test/browser/**",
+            "test/ssr.test.ts",
+            "test/build.test.ts",
+          ],
           typecheck: {
             enabled: true,
             tsconfig: "./test/tsconfig.json",
@@ -229,11 +235,21 @@ export default defineConfig({
           },
         },
       },
+      {
+        root: "packages/astro",
+        resolve: sources,
+        test: {
+          name: "astro:browser",
+          include: ["test/browser/**/*.test.ts"],
+          ...browserTest(),
+          setupFiles: ["./test/setup/console.ts", "./test/setup/browser.ts"],
+        },
+      },
       "packages/astro/vitest.config.ts",
       {
         root: "packages/astro",
         test: {
-          name: "astro:browser",
+          name: "astro:e2e",
           environment: "node",
           include: ["test/e2e/**/*.test.ts"],
           globalSetup: ["./test/e2e/setup.ts"],
