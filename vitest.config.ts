@@ -31,7 +31,8 @@ function sourcesFor(css: "react" | "vue") {
 }
 const sources = sourcesFor("react");
 
-const browserTest = {
+// A function, because Vitest writes a name into each browser instance, so two projects cannot share them.
+const browserTest = () => ({
   css: { include: [/reveal\.css$/] },
   retry: process.env.CI ? 2 : 0,
   browser: {
@@ -49,7 +50,7 @@ const browserTest = {
     trace: "on-first-retry" as const,
     commands: { emulateReducedMotion },
   },
-};
+});
 
 const coverageThreshold = { lines: 90, functions: 90, branches: 85, statements: 90 };
 
@@ -92,7 +93,7 @@ export default defineConfig({
         test: {
           name: "core:browser",
           include: ["test/browser/**/*.test.ts"],
-          ...browserTest,
+          ...browserTest(),
           setupFiles: ["./test/setup/browser.ts"],
         },
       },
@@ -113,12 +114,22 @@ export default defineConfig({
           environment: "jsdom",
           setupFiles: ["./test/setup/console.ts", "./test/setup/dom.ts"],
           include: ["test/**/*.test.{ts,tsx}"],
-          exclude: ["test/package/**", "test/ssr.test.tsx"],
+          exclude: ["test/package/**", "test/browser/**", "test/ssr.test.tsx"],
           typecheck: {
             enabled: true,
             tsconfig: "./test/tsconfig.json",
             include: ["test/types/**/*.test-d.{ts,tsx}"],
           },
+        },
+      },
+      {
+        root: "packages/react",
+        resolve: sourcesFor("react"),
+        test: {
+          name: "react:browser",
+          include: ["test/browser/**/*.test.{ts,tsx}"],
+          ...browserTest(),
+          setupFiles: ["./test/setup/console.ts", "./test/setup/browser.ts"],
         },
       },
       {

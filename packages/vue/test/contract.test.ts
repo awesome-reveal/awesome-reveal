@@ -6,7 +6,7 @@ import {
   describeCascadeContract,
   describeContract,
   type Harness,
-} from "@awesome-reveal/test-utils/contract";
+} from "@awesome-reveal/test-utils/contract-jsdom";
 
 import { Cascade, Reveal } from "../src/Reveal";
 import { vCascade, vReveal } from "../src/vReveal";

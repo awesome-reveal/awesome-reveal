@@ -3,7 +3,7 @@ import {
   describeContract,
   type ContractOptions,
   type Harness,
-} from "@awesome-reveal/test-utils/contract";
+} from "@awesome-reveal/test-utils/contract-jsdom";
 
 import { RevealElement } from "../src/element";
 
