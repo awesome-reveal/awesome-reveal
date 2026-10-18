@@ -26,7 +26,7 @@ Use the Node version in `.nvmrc`.
 - `pnpm build`, then `node scripts/smoke.mjs <core|react|compat|vue|astro|astro-island|next|next-pages> [dependency@version ...]`: install the packed tarballs into a clean project and build it. Most cases also load the build in Chromium. CI runs the matrix.
 - `pnpm lint` and `pnpm format`: lint and format the files. CI runs `pnpm format:check`.
 
-The pre-commit hook runs oxlint, oxfmt and the unit, SSR and browser tests related to the staged files. The browser tests run only in Chromium. The commit-msg hook runs commitlint with the Conventional Commits rules.
+The pre-commit hook runs oxlint and oxfmt on the staged files. CI runs the tests. The commit-msg hook runs commitlint with the Conventional Commits rules.
 
 ## Rules
 

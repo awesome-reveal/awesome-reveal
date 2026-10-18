@@ -13,4 +13,4 @@ Thanks for your help with awesome-reveal.
 2. Run `pnpm install`.
 3. Read [`AGENTS.md`](AGENTS.md) for the map of the workspace and the commands for the build, the tests and the lint.
 
-`pnpm install` also installs a pre-commit hook. The hook fixes lint and format problems in the staged files. It also runs the unit and SSR tests that are related to these files.
+`pnpm install` also installs a pre-commit hook. The hook fixes lint and format problems in the staged files.
