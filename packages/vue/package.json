@@ -87,7 +87,7 @@
   "devDependencies": {
     "vitest-browser-vue": "^3.1.0",
     "vue": "catalog:",
-    "vue-tsc": "^3.3.12"
+    "vue-tsc": "^3.3.13"
   },
   "peerDependencies": {
     "vue": "^3.5.0"
