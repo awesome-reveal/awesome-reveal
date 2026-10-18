@@ -18,5 +18,5 @@ paths:
 - The Vite config of Astro aliases the bare `astro` import to its types. In that environment, import the Astro API, such as `build`, by its resolved path, as `test/build-site.ts` does.
 - The programmatic `build` and `preview` need `root` and `outDir` as filesystem paths. With file URL strings, Astro builds 0 pages. The preview server of `@astrojs/node` reports the configured port, so port 0 does not work.
 - Astro 6 and 7 give different output: Astro 6 adds `data-astro-source-file` and whitespace in the container, and the minifiers write `@media(` or `@media (` and other quotes. Keep the test patterns tolerant.
-- The example and `astro:browser` need Astro 7, because `@astrojs/node` 11.1.3 and later need Astro 7.2.1 or later. The Astro 6 CI job runs only `astro:unit` and `astro:ssr`.
+- The example and `astro:e2e` need Astro 7, because `@astrojs/node` 11.1.3 and later need Astro 7.2.1 or later. The Astro 6 CI job runs `astro:unit`, `astro:ssr` and `astro:browser`.
 - `tsc` cannot read `.astro` files. `test/astro.d.ts` declares them for the tests. `astro check` reports only the files of the tsconfig `include`, so the example tsconfig includes `packages/astro/src/**/*.astro`. The `tsconfig.base.json` paths resolve the imports to the sources. The e2e test also builds the example on the sources.

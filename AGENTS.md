@@ -7,7 +7,7 @@ Reveal-on-scroll animations for many frameworks, built on IntersectionObserver a
 - `packages/core`: the `reveal` and `cascade` functions, which need no CSS, and the `/adapter` entry for the official adapters.
 - `packages/react`, `packages/vue`, `packages/astro`: the framework adapters. Each depends on core and ships the CSS that hides its server markup.
 - `packages/react-awesome-reveal`: the compat package for v4 users. It re-exports `@awesome-reveal/react`.
-- `packages/test-utils`: private test mocks, setup files and checks for the adapters.
+- `packages/test-utils`: private test helpers, pass-through spies, setup files and checks for the adapters.
 - `packages/*/skills`: agent skills for the users of each package. pnpm links them into consumer projects.
 - `examples/react`, `examples/vue`, `examples/astro`, `examples/next`: apps for manual checks (`pnpm --filter example-react dev`). The examples import the `dist` output of the packages, so run `pnpm build` first.
 - `vite.lib.config.ts`: the library build that all packages share.
@@ -15,10 +15,10 @@ Reveal-on-scroll animations for many frameworks, built on IntersectionObserver a
 
 ## Commands
 
-Use the Node version in `.nvmrc`. jsdom needs Node `^22.22.2`, `^24.15.0` or `>=26`.
+Use the Node version in `.nvmrc`.
 
 - `pnpm exec playwright install --with-deps --only-shell chromium firefox webkit`: run once before the browser tests.
-- `pnpm test`: the unit, SSR and browser tests. Add `--coverage` to check the CI thresholds.
+- `pnpm test`: the unit, SSR, browser and Astro e2e tests. Add `--coverage` to check the CI thresholds.
 - `pnpm vitest run --project core:browser`: run one project.
 - `REVEAL_BROWSERS=chromium,webkit pnpm test`: run the browser tests only in the listed browsers. The default is chromium, firefox and webkit.
 - `pnpm exec tsc -p packages/<package>/test`: type-check the tests. For Vue, run `pnpm --filter @awesome-reveal/vue exec vue-tsc -p test`. `pnpm build` type-checks only `src`.
@@ -26,7 +26,7 @@ Use the Node version in `.nvmrc`. jsdom needs Node `^22.22.2`, `^24.15.0` or `>=
 - `pnpm build`, then `node scripts/smoke.mjs <core|react|compat|vue|astro|astro-island|next|next-pages> [dependency@version ...]`: install the packed tarballs into a clean project and build it. Most cases also load the build in Chromium. CI runs the matrix.
 - `pnpm lint` and `pnpm format`: lint and format the files. CI runs `pnpm format:check`.
 
-The pre-commit hook runs oxlint, oxfmt and the unit and SSR tests related to the staged files. The commit-msg hook runs commitlint with the Conventional Commits rules.
+The pre-commit hook runs oxlint, oxfmt and the unit, SSR and browser tests related to the staged files. The browser tests run only in Chromium. The commit-msg hook runs commitlint with the Conventional Commits rules.
 
 ## Rules
 

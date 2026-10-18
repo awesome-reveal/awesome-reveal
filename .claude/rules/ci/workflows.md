@@ -10,7 +10,7 @@ paths:
 - Check out with `persist-credentials: false`.
 - Run `actionlint` after each change.
 - The `lint` job runs `astro check` in the Astro example, because `tsc` cannot read `.astro` files.
-- The `test` job uses the catalog version of each framework. The `framework` job tests the older majors in the peer ranges, with only the unit and SSR projects. The core browser tests do not use a framework, and the Astro example needs the current Astro major.
+- The `test` job uses the catalog version of each framework. The `framework` job tests the older majors in the peer ranges. It runs the unit, SSR and browser projects of its package in Chromium only, in the Playwright container, with `shell: bash`. The Astro example needs the current Astro major.
 - Run the browser tests in the `mcr.microsoft.com/playwright` container, with `--user 1001` as the Playwright CI guide shows. The image has the browsers and their system packages. A `playwright install --with-deps` step takes about 70 s on `ubuntu-latest`, and the image pull takes about 30 s.
 - Keep the image tag equal to the `playwright` version in `pnpm-lock.yaml`. If the versions differ, the tests fail with "Executable doesn't exist". Update the tag in the PR that upgrades Playwright.
 - In the container, `run` steps use `sh`, not `bash`, and `jq` is not available.
