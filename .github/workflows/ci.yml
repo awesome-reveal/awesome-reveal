@@ -136,6 +136,15 @@ jobs:
           read -r -a projects <<< "$PROJECTS"
           pnpm vitest run "${projects[@]}"
 
+      - name: Upload failure screenshots and traces
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: browser-test-results-${{ matrix.name }}
+          path: .vitest/
+          include-hidden-files: true
+          if-no-files-found: ignore
+
   package:
     name: Package
     runs-on: ubuntu-latest
