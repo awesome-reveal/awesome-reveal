@@ -12,10 +12,10 @@ Do not run `npm publish`, `npm trust` or `npm dist-tag` yourself. The agent shel
 ## Merge a release PR
 
 1. Read the PR diff. Check the versions in `.release-please-manifest.json` and the new `CHANGELOG.md` entries.
-2. Make sure that each public package exists on npm and has a trusted publisher: `npm view <package> version` and `npm trust list <package>`. List the public packages with `pnpm -r ls --json --depth -1 | jq -r '.[] | select(.private | not) | .name'`. One missing publisher fails the job. Do "Publish a new package" first if necessary.
-3. Wait for the CI checks of the PR: `gh pr checks <number> --watch --fail-fast`. Squash-merge it only when all checks pass: `gh pr merge <number> --squash`. CI runs on it when the secret `RELEASE_PLEASE_TOKEN` is set. With `GITHUB_TOKEN` alone, the PR has no CI runs.
-4. Watch the run: `gh run watch <run-id> --exit-status`. Find the ID with `gh run list --workflow release.yml --branch <branch> --limit 1`.
-5. Check the result: `npm view <package> dist-tags --prefer-online`. npm stages a new version for some minutes before `npm view` shows it, so wait before you count a version as missing.
+2. Make sure that each public package exists on npm: `npm view <package> version`. List the public packages with `pnpm -r ls --json --depth -1 | jq -r '.[] | select(.private | not) | .name'`. The `publish` job has no npm token, so a package that it released before has a trusted publisher. A package with no version or with `0.0.0-placeholder` is new. Do "Publish a new package" for it first: one missing publisher fails the job.
+3. Wait for the CI checks of the PR, then squash-merge it: `gh pr checks <number> --watch --fail-fast >/dev/null && gh pr merge <number> --squash --delete-branch`. The watch prints the full table at each refresh, and its exit status is enough. CI runs on the PR when the secret `RELEASE_PLEASE_TOKEN` is set. With `GITHUB_TOKEN` alone, the PR has no CI runs.
+4. Watch the run in the background: `gh run watch <run-id> --exit-status`. The `publish` job waits until npm shows each version, and this can take 20 minutes. Find the ID with `gh run list --workflow release.yml --branch <branch> --limit 1`.
+5. Check the dist-tags: `npm view <package> dist-tags --prefer-online`. A green run already proves that npm shows each version.
 
 If the `publish` job fails because of an external cause, such as the trusted publisher, the environment or an npm outage:
 
