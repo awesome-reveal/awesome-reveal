@@ -8,7 +8,7 @@ import {
   type RevealStore,
 } from "../../src/adapter";
 import css from "../../../react/src/reveal.css?raw";
-import { settle } from "./helpers";
+import { settle } from "@awesome-reveal/test-utils/layout";
 
 const opacity = (element: Element) => getComputedStyle(element).opacity;
 const hold = (element: Element) =>

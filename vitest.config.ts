@@ -4,6 +4,8 @@ import { playwright } from "@vitest/browser-playwright";
 import vue from "@vitejs/plugin-vue";
 import { coverageConfigDefaults, defineConfig } from "vitest/config";
 
+import { emulateReducedMotion } from "./packages/test-utils/src/commands.ts";
+
 function aliases(entries: [string, string][]) {
   return entries.map(([find, source]) => ({
     find: new RegExp(`^${find}$`),
@@ -15,15 +17,38 @@ const testUtils = aliases([["@awesome-reveal/test-utils/(.+)", "packages/test-ut
 
 // Unit tests run against the sources of the other workspace packages, so no build is necessary first.
 // The :package projects test dist, so they get only the test-utils alias.
-const sources = {
-  alias: [
-    ...aliases([
-      ["@awesome-reveal/core", "packages/core/src/index.ts"],
-      ["@awesome-reveal/core/adapter", "packages/core/src/adapter.ts"],
-      ["#reveal-style.css", "packages/react/src/reveal.css"],
-    ]),
-    ...testUtils,
-  ],
+function sourcesFor(css: "react" | "vue") {
+  return {
+    alias: [
+      ...aliases([
+        ["@awesome-reveal/core", "packages/core/src/index.ts"],
+        ["@awesome-reveal/core/adapter", "packages/core/src/adapter.ts"],
+        ["#reveal-style.css", `packages/${css}/src/reveal.css`],
+      ]),
+      ...testUtils,
+    ],
+  };
+}
+const sources = sourcesFor("react");
+
+const browserTest = {
+  css: { include: [/reveal\.css$/] },
+  retry: process.env.CI ? 2 : 0,
+  browser: {
+    enabled: true,
+    headless: true,
+    provider: playwright(),
+    instances: (["chromium", "firefox", "webkit"] as const)
+      .filter(
+        (browser) =>
+          !process.env.REVEAL_BROWSERS || process.env.REVEAL_BROWSERS.split(",").includes(browser),
+      )
+      .map((browser) => ({ browser })),
+    // The tests scroll by viewport heights.
+    viewport: { width: 1280, height: 720 },
+    trace: "on-first-retry" as const,
+    commands: { emulateReducedMotion },
+  },
 };
 
 const coverageThreshold = { lines: 90, functions: 90, branches: 85, statements: 90 };
@@ -67,23 +92,8 @@ export default defineConfig({
         test: {
           name: "core:browser",
           include: ["test/browser/**/*.test.ts"],
-          css: { include: [/reveal\.css$/] },
-          retry: process.env.CI ? 2 : 0,
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: playwright(),
-            instances: (["chromium", "firefox", "webkit"] as const)
-              .filter(
-                (browser) =>
-                  !process.env.REVEAL_BROWSERS ||
-                  process.env.REVEAL_BROWSERS.split(",").includes(browser),
-              )
-              .map((browser) => ({ browser })),
-            // The tests scroll by viewport heights.
-            viewport: { width: 1280, height: 720 },
-            trace: "on-first-retry",
-          },
+          ...browserTest,
+          setupFiles: ["./test/setup/browser.ts"],
         },
       },
       {

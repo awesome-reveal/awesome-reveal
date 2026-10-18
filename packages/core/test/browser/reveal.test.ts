@@ -2,7 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { reveal, cascade, type RevealHandle, type RevealOptions } from "../../src/index";
 import { createReveal } from "../../src/adapter";
 import { collectReports } from "@awesome-reveal/test-utils/reports";
-import { mountBelowTheFold, scrollIntoView, scrollToTop, settle, showTopHalf } from "./helpers";
+import {
+  mountBelowTheFold,
+  scrollIntoView,
+  scrollToTop,
+  settle,
+  showPart,
+} from "@awesome-reveal/test-utils/layout";
+import { setReducedMotion } from "@awesome-reveal/test-utils/reduced-motion";
 
 let target: HTMLElement;
 let handles: RevealHandle[];
@@ -17,12 +24,10 @@ const native = { keyframes: [{ opacity: 0 }, { opacity: 1 }], duration: 60_000 }
 beforeEach(() => {
   target = mountBelowTheFold();
   handles = [];
-  vi.spyOn(window, "matchMedia").mockReturnValue({ matches: false } as MediaQueryList);
 });
 afterEach(() => {
   for (const handle of handles) handle.dispose();
   vi.unstubAllGlobals();
-  vi.restoreAllMocks();
   document.body.innerHTML = "";
 });
 async function enter(element = target) {
@@ -163,7 +168,7 @@ describe("zero-CSS reveal", () => {
   });
   it("waits for the threshold", async () => {
     track(reveal(target, { ...native, threshold: 0.8 }));
-    showTopHalf(target);
+    showPart(target, 0.5);
     await settle();
     expect(animation().playState).toBe("paused");
     await enter();
@@ -204,7 +209,7 @@ describe("zero-CSS reveal", () => {
       ["native keyframes", native],
     ])("with %s, also below the threshold", async (_, options: RevealOptions) => {
       track(reveal(target, { ...options, threshold: 0.8 }));
-      showTopHalf(target);
+      showPart(target, 0.5);
       await settle();
       expect(opacity()).toBe("0");
       link().focus();
@@ -265,8 +270,8 @@ describe("zero-CSS reveal", () => {
     expect(target.getAnimations()).toEqual([]);
     expect(reports()).toEqual([expect.any(TypeError)]);
   });
-  it("reduced motion immediately exposes generated, native and delayed entrances", () => {
-    vi.mocked(window.matchMedia).mockReturnValue({ matches: true } as MediaQueryList);
+  it("reduced motion immediately exposes generated, native and delayed entrances", async () => {
+    await setReducedMotion("reduce");
     track(reveal(target, { ...native, delay: 60_000 }));
     track(reveal(target.firstElementChild!));
     expect(opacity()).toBe("1");
@@ -385,8 +390,8 @@ describe("cascade", () => {
     expect(Number(opacity(child))).toBeGreaterThan(0);
     expect(Number(opacity(child))).toBeLessThan(1);
   });
-  it("reduced motion bypasses every child delay", () => {
-    vi.mocked(window.matchMedia).mockReturnValue({ matches: true } as MediaQueryList);
+  it("reduced motion bypasses every child delay", async () => {
+    await setReducedMotion("reduce");
     track(cascade(target, { ...native, interval: 10_000 }));
     expect(target.getAnimations({ subtree: true })).toEqual([]);
     expect(Array.from(target.children).map((c) => getComputedStyle(c).opacity)).toEqual([

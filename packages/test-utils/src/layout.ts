@@ -4,12 +4,19 @@ export function mountBelowTheFold(): HTMLElement {
   return document.getElementById("target")!;
 }
 
+export function createStage(): HTMLElement {
+  document.body.innerHTML = `<div style="height: 150vh"></div><div id="stage"></div><div style="height: 150vh"></div><style>[data-contract] { height: 100px }</style>`;
+  scrollTo(0, 0);
+  return document.getElementById("stage")!;
+}
+
 export function scrollIntoView(element: Element) {
   element.scrollIntoView({ block: "center" });
 }
 
-export function showTopHalf(element: HTMLElement) {
-  scrollTo(0, element.offsetTop - innerHeight + element.offsetHeight / 2);
+export function showPart(element: Element, fraction: number) {
+  const { top, height } = element.getBoundingClientRect();
+  scrollTo(0, scrollY + top - innerHeight + height * fraction);
 }
 
 export function scrollToTop() {
