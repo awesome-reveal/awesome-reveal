@@ -51,6 +51,13 @@ export function describeDocs(root: URL, { jsx, skipFences }: DocsOptions = {}) {
       return readFileSync(new URL(`${skill}/SKILL.md`, skillsDir), "utf8");
     }
 
+    // npm adds a LICENSE file only from the package folder, not from the workspace root.
+    it("ships the LICENSE of the repository", () => {
+      expect(readFileSync(new URL("LICENSE", root), "utf8")).toBe(
+        readFileSync(new URL("../../LICENSE", root), "utf8"),
+      );
+    });
+
     it("ships the skills folder, where pnpm links skills from", () => {
       expect(skills.length).toBeGreaterThan(0);
       expect(pkg.files).toContain("skills");

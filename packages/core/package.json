@@ -45,6 +45,14 @@
   ],
   "type": "module",
   "sideEffects": false,
+  "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "adapter": [
+        "dist/adapter.d.ts"
+      ]
+    }
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -61,7 +69,7 @@
   },
   "scripts": {
     "build": "tsc --noEmit && vite build",
-    "check:package": "tsc -p test/package && publint --strict && attw --pack . --profile esm-only"
+    "check:package": "tsc -p test/package && publint --strict && attw --pack . --ignore-rules cjs-resolves-to-esm"
   },
   "engines": {
     "node": ">=20.19.0"

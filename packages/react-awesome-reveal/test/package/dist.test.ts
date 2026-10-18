@@ -22,6 +22,12 @@ describe("dist", () => {
   });
 });
 
+it("ships the LICENSE of the repository", () => {
+  expect(readFileSync(new URL("LICENSE", root), "utf8")).toBe(
+    readFileSync(new URL("../../LICENSE", root), "utf8"),
+  );
+});
+
 describe("skills", () => {
   // v4 users approve the skills of this package, not those of @awesome-reveal/react.
   it("ships the migrating-from-v4 skill of @awesome-reveal/react unchanged", () => {

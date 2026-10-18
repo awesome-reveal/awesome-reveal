@@ -51,6 +51,13 @@
     "*.css"
   ],
   "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "reveal.css": [
+        "dist/reveal.css.d.ts"
+      ]
+    }
+  },
   "imports": {
     "#reveal-style.css": {
       "node": {
@@ -79,7 +86,7 @@
   },
   "scripts": {
     "build": "tsc --noEmit && vite build",
-    "check:package": "tsc -p test/package && publint --strict && attw --pack . --profile esm-only"
+    "check:package": "tsc -p test/package && publint --strict && attw --pack . --ignore-rules cjs-resolves-to-esm"
   },
   "dependencies": {
     "@awesome-reveal/core": "workspace:^"
