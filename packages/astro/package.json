@@ -1,6 +1,6 @@
 {
   "name": "@awesome-reveal/astro",
-  "version": "1.0.0-next.10",
+  "version": "1.0.0-next.11",
   "description": "Reveal-on-scroll animations for Astro, built on the Web Animations API and IntersectionObserver.",
   "keywords": [
     "animate-on-scroll",

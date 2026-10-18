@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.0.0-next.11](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/react@1.0.0-next.10...@awesome-reveal/react@1.0.0-next.11) (2026-10-18)
+
+
+### Bug Fixes
+
+* ship types for moduleResolution node and a LICENSE in each package ([#327](https://github.com/awesome-reveal/awesome-reveal/issues/327)) ([6934561](https://github.com/awesome-reveal/awesome-reveal/commit/69345612f66ca743004cdbdf2d9ddb6b417b873c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @awesome-reveal/core bumped to 1.0.0-next.11
+
 ## [1.0.0-next.10](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/react@1.0.0-next.9...@awesome-reveal/react@1.0.0-next.10) (2026-10-15)
 
 
