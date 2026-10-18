@@ -4,8 +4,8 @@ process.env.REVEAL_BROWSERS ??= "chromium";
 // `vitest related` fails on a browser project that imports CSS: Vitest transforms the files in the SSR environment of
 // that project, and there vite:css-post throws. So the hook runs these projects in full when a file that they use changes.
 const fullProjects = {
-  "react:browser": /^packages\/(core|test-utils|react)\//,
-  "vue:browser": /^packages\/(core|test-utils|vue)\//,
+  "react:browser": /^packages\/((core|test-utils)\/src|react)\//,
+  "vue:browser": /^packages\/((core|test-utils)\/src|vue)\//,
 };
 
 // A task in the "*" list runs after the formatter; a separate glob would run at the same time.
