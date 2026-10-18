@@ -11,7 +11,7 @@ paths:
 - Use a long `duration` (60 s) when a test inspects a running animation, so that it does not finish first.
 - Wait for a DOM change with `expect.element(...)`. Use `settle()` when you expect no change.
 - In CI, a failed test runs again, and the first retry records a Playwright trace. Vitest copies the traces and the failure screenshots into `.vitest/attachments`, and CI uploads that folder.
-- Change the reduced motion setting with `setReducedMotion()`. It sends the `emulateReducedMotion` command to `ctx.page`, which changes the media of the whole page, not only of the test frame. The browser setup file resets it after each test. The media query event arrives only after a rendering update, so `setReducedMotion()` waits with `settle()`. Do not add another wait.
+- Change the reduced motion setting with `setReducedMotion()`. It sends the `emulateReducedMotion` command to `ctx.page`, which changes the media of the whole page, not only of the test frame. The browser setup file resets it to `"no-preference"` after each test. Do not reset it with `null`: then WebKit in the CI container uses its system setting, which is `reduce`. The media query event arrives only after a rendering update, so `setReducedMotion()` waits with `settle()`. Do not add another wait.
 - `emulateMedia({ media: "print" })` sends no `beforeprint` or `afterprint` event. A print test dispatches both events itself.
 - Fault injection uses `vi.stubGlobal`, an invalid input, `withoutAnimate()` or `rejectEasing()`. All other spies call the real API.
 - `interceptObserver()` is a pass-through spy on the `IntersectionObserver` constructor. It lets a test call the real callback with entries that it builds. Use it only when the real layout cannot make the entry:

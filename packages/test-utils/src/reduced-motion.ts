@@ -2,7 +2,7 @@ import { commands } from "vitest/browser";
 
 import { settle } from "./layout";
 
-type ReducedMotion = "reduce" | "no-preference" | null;
+type ReducedMotion = "reduce" | "no-preference";
 
 declare module "vitest/browser" {
   interface BrowserCommands {
@@ -21,6 +21,7 @@ export async function setReducedMotion(value: ReducedMotion): Promise<void> {
 
 export async function resetReducedMotion(): Promise<void> {
   if (!changed) return;
-  await setReducedMotion(null);
+  // The Playwright context default. `null` gives the system setting, which is "reduce" for WebKit in the CI container.
+  await setReducedMotion("no-preference");
   changed = false;
 }

@@ -2,7 +2,7 @@
 import "@vitest/browser-playwright";
 import type { BrowserCommand } from "vitest/node";
 
-type ReducedMotion = "reduce" | "no-preference" | null;
+type ReducedMotion = "reduce" | "no-preference";
 
 // Playwright has no `emulateMedia` for a frame, so the command changes the media of the whole page.
 export const emulateReducedMotion: BrowserCommand<[options: { reducedMotion: ReducedMotion }]> = (
