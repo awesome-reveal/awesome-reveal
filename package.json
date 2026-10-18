@@ -11,7 +11,7 @@
     "prepare": "husky",
     "test": "vitest run --project \"*:unit\" --project \"*:ssr\" --project \"*:browser\" --project \"*:e2e\"",
     "test:package": "pnpm build && vitest run --project \"*:package\" && pnpm --filter \"./packages/*\" --parallel check:package",
-    "test:watch": "vitest --project \"*:unit\""
+    "test:watch": "vitest --project \"*:unit\" --project \"*:browser\""
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
