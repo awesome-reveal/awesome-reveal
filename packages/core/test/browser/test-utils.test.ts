@@ -3,7 +3,11 @@ import { describe, expect, it, vi } from "vitest";
 import { createStage } from "@awesome-reveal/test-utils/layout";
 import { setReducedMotion } from "@awesome-reveal/test-utils/reduced-motion";
 import { collectWindowErrors, isCollectedWindowError } from "@awesome-reveal/test-utils/reports";
-import { trackAnimations, trackObservers } from "@awesome-reveal/test-utils/spies";
+import {
+  interceptObserver,
+  trackAnimations,
+  trackObservers,
+} from "@awesome-reveal/test-utils/spies";
 
 describe("test-utils in a browser", () => {
   it("createStage puts the stage below the fold", () => {
@@ -51,6 +55,20 @@ describe("test-utils in a browser", () => {
     observer.disconnect();
     expect(tracker.observerOf(element)).toBeUndefined();
     expect(tracker.live()).toEqual([]);
+  });
+  it("interceptObserver sends entries to the callback of the last real observer", () => {
+    const report = interceptObserver();
+    const first = vi.fn();
+    const last = vi.fn();
+    new IntersectionObserver(first);
+    const observer = new IntersectionObserver(last);
+    expect(observer).toBeInstanceOf(IntersectionObserver);
+    const entry = { intersectionRatio: 0.5 } as IntersectionObserverEntry;
+    report(entry, entry);
+    expect(first).not.toHaveBeenCalled();
+    expect(last).toHaveBeenCalledOnce();
+    expect(last.mock.calls[0]![0]).toEqual([entry, entry]);
+    expect(last.mock.calls[0]![1]).toBe(observer);
   });
   it("the console setup accepts only the relay of a collected window error", async () => {
     const stop = collectWindowErrors();

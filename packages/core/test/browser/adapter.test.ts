@@ -7,7 +7,12 @@ import {
   scrollToTop,
   settle,
 } from "@awesome-reveal/test-utils/layout";
-import { trackAnimations, trackObservers } from "@awesome-reveal/test-utils/spies";
+import {
+  interceptObserver,
+  trackAnimations,
+  trackObservers,
+  type AnimateCall,
+} from "@awesome-reveal/test-utils/spies";
 
 let target: HTMLElement;
 let stores: RevealStore[];
@@ -18,6 +23,8 @@ const keep = <Store extends RevealStore>(store: Store) => {
 const opacity = (element: Element = target) => getComputedStyle(element).opacity;
 const animation = (element: Element = target) => element.getAnimations()[0]!;
 const native = { keyframes: [{ opacity: 0 }, { opacity: 1 }], duration: 60_000 };
+// Core reports a message one time per page, so a repeat of a test needs a new message.
+let run = 0;
 const paragraphs = () => Array.from(target.children) as [HTMLElement, HTMLElement, HTMLElement];
 
 beforeEach(() => {
@@ -88,7 +95,8 @@ describe("createReveal", () => {
     state.attach(null);
     state.attach(target);
     expect(animate.calls()).toHaveLength(2);
-    expect(onReveal.mock.calls).toEqual([[target]]);
+    expect(onReveal).toHaveBeenCalledOnce();
+    expect(onReveal.mock.calls[0]![0]).toBe(target);
     state.setOptions({ ...options, onReveal, when: false });
     state.setOptions({ ...options, onReveal, when: true });
     expect(onReveal).toHaveBeenCalledTimes(2);
@@ -170,11 +178,13 @@ describe("createReveal", () => {
   });
 
   it("plays no entrance on a different element after null", () => {
+    const animate = trackAnimations();
     const [first, second] = paragraphs();
     const state = keep(createReveal({ ...options, when: true }));
     state.attach(first);
     state.attach(null);
     state.attach(second);
+    expect(animate.calls().filter((call) => call.element === second)).toEqual([]);
     expect(second.getAnimations()).toEqual([]);
   });
 
@@ -193,17 +203,20 @@ describe("createReveal", () => {
 
   it("plays the entrance once when when is true from the start", () => {
     const observers = trackObservers();
+    const animate = trackAnimations();
     const [first, second] = paragraphs();
     const state = keep(createReveal({ ...options, when: true }));
     state.attach(first);
     expect(animation(first).playState).toBe("running");
     state.attach(second);
+    expect(animate.calls().filter((call) => call.element === second)).toEqual([]);
     expect(second.getAnimations()).toEqual([]);
     expect(observers.live()).toEqual([]);
   });
 
   it("keeps a revealed state on a new element, and observes a hidden one", async () => {
     const observers = trackObservers();
+    const animate = trackAnimations();
     const [first, second, third] = paragraphs();
     const state = keep(createReveal(options));
     state.attach(first);
@@ -213,6 +226,7 @@ describe("createReveal", () => {
     expect(observers.observerOf(second)).toBe(observers.live()[0]);
     await enter(state);
     state.attach(third);
+    expect(animate.calls().filter((call) => call.element === third)).toEqual([]);
     expect(third.getAnimations()).toEqual([]);
     expect(state.revealed).toBe(true);
     expect(observers.live()).toEqual([]);
@@ -230,6 +244,22 @@ describe("createReveal", () => {
     expect(observers.live()).toEqual([]);
   });
 
+  it("ignores a queued report after the detach", () => {
+    const report = interceptObserver();
+    const listener = vi.fn();
+    const state = keep(createReveal(options));
+    state.subscribe(listener);
+    state.attach(target);
+    state.attach(null);
+    report({
+      target,
+      isIntersecting: true,
+      intersectionRatio: 1,
+    } as unknown as IntersectionObserverEntry);
+    expect(state.revealed).toBe(false);
+    expect(listener).not.toHaveBeenCalled();
+  });
+
   it("restarts the observer only for when and threshold", () => {
     const observers = trackObservers();
     const state = keep(createReveal({ ...options, threshold: 0.5 }));
@@ -242,7 +272,8 @@ describe("createReveal", () => {
       duration: 100,
       when: null,
     } as never);
-    expect(observers.live()).toEqual([first]);
+    expect(observers.live()).toHaveLength(1);
+    expect(observers.live()[0]).toBe(first);
     state.setOptions({ ...options, threshold: 0.2 });
     expect(observers.live()).toHaveLength(1);
     expect(observers.live()[0]).not.toBe(first);
@@ -277,7 +308,7 @@ describe("createReveal", () => {
 
 it("reports a throwing adapter callback once without breaking the reveal", async () => {
   const reports = collectReports();
-  const error = new Error("callback failure");
+  const error = new Error(`callback failure ${++run}`);
   const onReveal = () => {
     throw error;
   };
@@ -291,8 +322,7 @@ it("reports a throwing adapter callback once without breaking the reveal", async
 });
 
 describe("createCascade", () => {
-  const delays = (calls: ReturnType<ReturnType<typeof trackAnimations>["calls"]>) =>
-    calls.map((call) => call.options.delay);
+  const delays = (calls: AnimateCall[]) => calls.map((call) => call.options.delay);
 
   it("animates the direct children at the reveal, interval milliseconds apart", async () => {
     const animate = trackAnimations();
@@ -300,7 +330,9 @@ describe("createCascade", () => {
     state.attach(target);
     expect(animate.calls()).toEqual([]);
     await enter(state);
-    expect(animate.calls().map((call) => call.element)).toEqual(paragraphs());
+    expect(
+      animate.calls().map((call) => paragraphs().indexOf(call.element as HTMLElement)),
+    ).toEqual([0, 1, 2]);
     expect(delays(animate.calls())).toEqual([0, 80, 160]);
   });
 
@@ -311,7 +343,8 @@ describe("createCascade", () => {
     state.attach(target);
     target.innerHTML = "<p>a</p><p>b</p>";
     await enter(state);
-    expect(animate.calls().map((call) => call.element)).toEqual(Array.from(target.children));
+    const children = Array.from(target.children);
+    expect(animate.calls().map((call) => children.indexOf(call.element))).toEqual([0, 1]);
     expect(delays(animate.calls())).toEqual([0, 50]);
   });
 
@@ -333,7 +366,8 @@ describe("createCascade", () => {
     const state = keep(createCascade({ when: true, onReveal }));
     state.attach(target);
     expect(state.revealed).toBe(true);
-    expect(onReveal.mock.calls).toEqual([[target]]);
+    expect(onReveal).toHaveBeenCalledOnce();
+    expect(onReveal.mock.calls[0]![0]).toBe(target);
   });
 });
 

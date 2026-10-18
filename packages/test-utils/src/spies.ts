@@ -65,6 +65,18 @@ export function trackObservers() {
 }
 
 /**
+ * Input injection: the observers stay real, and the returned function sends entries to the callback of the
+ * last observer, such as entries that the real layout cannot give.
+ */
+export function interceptObserver() {
+  const constructor = vi.spyOn(globalThis, "IntersectionObserver");
+  return (...entries: IntersectionObserverEntry[]) => {
+    const [callback] = constructor.mock.calls.at(-1)!;
+    callback(entries, constructor.mock.instances.at(-1)!);
+  };
+}
+
+/**
  * Fault injection: removes `Element.prototype.animate`. The `vi.spyOn` makes `vi.restoreAllMocks()`
  * restore it.
  */

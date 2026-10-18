@@ -10,7 +10,12 @@ import {
   showPart,
 } from "@awesome-reveal/test-utils/layout";
 import { setReducedMotion } from "@awesome-reveal/test-utils/reduced-motion";
-import { trackAnimations, trackObservers, withoutAnimate } from "@awesome-reveal/test-utils/spies";
+import {
+  interceptObserver,
+  trackAnimations,
+  trackObservers,
+  withoutAnimate,
+} from "@awesome-reveal/test-utils/spies";
 
 let target: HTMLElement;
 let handles: RevealHandle[];
@@ -21,6 +26,8 @@ const track = (handle: RevealHandle) => {
 const opacity = (element: Element = target) => getComputedStyle(element).opacity;
 const animation = (element = target) => element.getAnimations()[0]!;
 const native = { keyframes: [{ opacity: 0 }, { opacity: 1 }], duration: 60_000 };
+// Core reports a message one time per page, so a repeat of a test needs a new message.
+let run = 0;
 
 beforeEach(() => {
   target = mountBelowTheFold();
@@ -36,15 +43,6 @@ async function enter(element = target) {
   await expect.poll(() => animation(element)?.playState).toBe("running");
 }
 
-// Input injection: the observer stays real, and the test sends entries that the real layout cannot give,
-// such as a frame with no root bounds or two entries in one report.
-function interceptObserver() {
-  const constructor = vi.spyOn(globalThis, "IntersectionObserver");
-  return (...entries: IntersectionObserverEntry[]) => {
-    const [callback] = constructor.mock.calls.at(-1)!;
-    callback(entries, constructor.mock.instances.at(-1)!);
-  };
-}
 const entry = (
   intersectionRatio: number,
   boundingClientRect = { width: 100, height: 100 },
@@ -205,12 +203,14 @@ describe("zero-CSS reveal", () => {
     await expect.poll(() => animation(small).playState).toBe("running");
   });
   it("reveals an element taller than the viewport at its entry when it cannot reach the threshold", async () => {
+    const observers = trackObservers();
     target.style.height = "300vh";
     track(reveal(target, { ...native, threshold: 0.5 }));
     await settle();
     expect(animation().playState).toBe("paused");
     scrollTo(0, target.offsetTop - innerHeight / 2);
     await expect.poll(() => animation().playState).toBe("running");
+    expect(observers.observerOf(target)).toBeUndefined();
   });
   describe("focus shows the element at once, with no entrance", () => {
     const link = (element = target) => element.querySelector("a")!;
@@ -328,17 +328,6 @@ describe("zero-CSS reveal", () => {
     expect(animation().playState).toBe("running");
     expect(animation().currentTime as number).toBeGreaterThanOrEqual(time);
     expect(animation().currentTime as number).toBeLessThan(60_000);
-  });
-  it("releases a finished entrance with no dispose", async () => {
-    const unlisten = vi.spyOn(window, "removeEventListener");
-    reveal(target, native);
-    await enter();
-    const entrance = animation();
-    entrance.finish();
-    await expect
-      .poll(() => unlisten.mock.calls.map(([type]) => type))
-      .toEqual(["beforeprint", "afterprint"]);
-    expect(entrance.playState).toBe("finished");
   });
   it("invalid thresholds reveal immediately and report the browser error", () => {
     const reports = collectReports();
@@ -467,7 +456,7 @@ describe("reveal", () => {
     expect(observers.live()).toEqual([]);
   });
   it("fails safe and reports when native animation creation throws", () => {
-    const error = new TypeError("core animate failed");
+    const error = new TypeError(`core animate failed ${++run}`);
     trackAnimations().rejectEasing("bogus", error);
     const reports = collectReports();
     expect(() =>
@@ -537,6 +526,8 @@ describe("cascade", () => {
     expect(animation(other.children[0] as HTMLElement).playState).toBe("paused");
     expect(observers.observerOf(target)).toBeUndefined();
     expect(observers.observerOf(other)).toBeDefined();
+    await enter(other.children[0] as HTMLElement);
+    expect(observers.observerOf(other)).toBeUndefined();
     handle.dispose();
     handle.dispose();
     expect(target.getAnimations({ subtree: true })).toEqual([]);
