@@ -23,11 +23,15 @@ describe("test-utils in a browser", () => {
     const element = createStage();
     const keyframes = [{ opacity: 0 }, { opacity: 1 }];
     element.animate(keyframes, { duration: 60_000 });
-    expect(tracker.calls()).toEqual([
-      { element, keyframes, options: { duration: 60_000 }, animation: element.getAnimations()[0] },
-    ]);
-    expect(tracker.active()).toEqual([element.getAnimations()[0]]);
-    tracker.calls()[0]!.animation.cancel();
+    const [call] = tracker.calls();
+    expect(tracker.calls()).toHaveLength(1);
+    expect(call!.element).toBe(element);
+    expect(call!.keyframes).toBe(keyframes);
+    expect(call!.options).toEqual({ duration: 60_000 });
+    expect(call!.animation).toBe(element.getAnimations()[0]);
+    expect(tracker.active()).toHaveLength(1);
+    expect(tracker.active()[0]).toBe(call!.animation);
+    call!.animation.cancel();
     expect(tracker.active()).toEqual([]);
 
     const error = new TypeError("test-utils easing");
@@ -48,20 +52,26 @@ describe("test-utils in a browser", () => {
     expect(tracker.observerOf(element)).toBeUndefined();
     expect(tracker.live()).toEqual([]);
   });
-  it("the console setup accepts only the relay of a collected window error", () => {
+  it("the console setup accepts only the relay of a collected window error", async () => {
     const stop = collectWindowErrors();
-    customElements.define(
-      "x-throws",
-      class extends HTMLElement {
-        connectedCallback() {
-          throw new SyntaxError("test-utils relay");
-        }
-      },
-    );
+    if (!customElements.get("x-throws")) {
+      customElements.define(
+        "x-throws",
+        class extends HTMLElement {
+          connectedCallback() {
+            throw new SyntaxError("test-utils relay");
+          }
+        },
+      );
+    }
     document.body.append(document.createElement("x-throws"));
     expect(stop()).toEqual([expect.any(SyntaxError)]);
-    expect(
-      vi.mocked(console.error).mock.calls.filter((args) => !isCollectedWindowError(args)),
-    ).toEqual([]);
+
+    const calls = () => vi.mocked(console.error).mock.calls;
+    await expect.poll(() => calls().filter(isCollectedWindowError).length).toBe(1);
+    expect(calls().filter((args) => !isCollectedWindowError(args))).toEqual([]);
+
+    expect(isCollectedWindowError([new Error("not collected")])).toBe(false);
+    expect(isCollectedWindowError([...calls()[0]!, "extra"])).toBe(false);
   });
 });
