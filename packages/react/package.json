@@ -96,7 +96,7 @@
     "@types/react-dom": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "vitest-browser-react": "^2.3.0"
+    "vitest-browser-react": "catalog:"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"

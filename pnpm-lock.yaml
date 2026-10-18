@@ -185,9 +185,18 @@ catalogs:
     vite:
       specifier: ^8.3.4
       version: 8.3.4
+    vitest-browser-react:
+      specifier: ^2.3.0
+      version: 2.3.0
+    vitest-browser-vue:
+      specifier: ^3.1.0
+      version: 3.1.0
     vue:
       specifier: ^3.5.44
       version: 3.5.44
+    vue-tsc:
+      specifier: ^3.3.13
+      version: 3.3.13
 
 importers:
 
@@ -333,7 +342,7 @@ importers:
         specifier: 'catalog:'
         version: 8.3.4(@types/node@24.19.1)(jiti@2.6.1)(yaml@2.9.1)
       vue-tsc:
-        specifier: ^3.3.13
+        specifier: 'catalog:'
         version: 3.3.13(typescript@5.7.2)
 
   packages/astro:
@@ -367,7 +376,7 @@ importers:
         specifier: 'catalog:'
         version: 19.3.1(react@19.3.1)
       vitest-browser-react:
-        specifier: ^2.3.0
+        specifier: 'catalog:'
         version: 2.3.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vitest@5.0.4)
 
   packages/react-awesome-reveal:
@@ -396,13 +405,13 @@ importers:
         version: link:../core
     devDependencies:
       vitest-browser-vue:
-        specifier: ^3.1.0
+        specifier: 'catalog:'
         version: 3.1.0(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vitest@5.0.4)(vue@3.5.44(typescript@5.7.2))
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@5.7.2)
       vue-tsc:
-        specifier: ^3.3.13
+        specifier: 'catalog:'
         version: 3.3.13(typescript@5.7.2)
 
 packages:
