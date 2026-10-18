@@ -26,7 +26,6 @@ updates:
           - react-dom
           - "@types/react"
           - "@types/react-dom"
-          - "@testing-library/react"
           - "@vitejs/plugin-react"
       vue:
         patterns:
@@ -38,3 +37,4 @@ updates:
         patterns:
           - vitest
           - "@vitest/*"
+          - "vitest-browser-*"

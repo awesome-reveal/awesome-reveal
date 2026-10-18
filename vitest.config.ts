@@ -112,8 +112,8 @@ export default defineConfig({
         resolve: sources,
         test: {
           name: "react:unit",
-          environment: "jsdom",
-          setupFiles: ["./test/setup/console.ts", "./test/setup/dom.ts"],
+          environment: "node",
+          setupFiles: ["./test/setup/console.ts"],
           include: ["test/**/*.test.{ts,tsx}"],
           exclude: ["test/package/**", "test/browser/**", "test/ssr.test.tsx"],
           typecheck: {
@@ -163,8 +163,8 @@ export default defineConfig({
         resolve: sources,
         test: {
           name: "vue:unit",
-          environment: "jsdom",
-          setupFiles: ["./test/setup/console.ts", "./test/setup/dom.ts"],
+          environment: "node",
+          setupFiles: ["./test/setup/console.ts"],
           include: ["test/**/*.test.ts"],
           exclude: ["test/package/**", "test/browser/**", "test/ssr.test.ts"],
           typecheck: {
@@ -218,8 +218,8 @@ export default defineConfig({
         resolve: sources,
         test: {
           name: "astro:unit",
-          environment: "jsdom",
-          setupFiles: ["./test/setup/console.ts", "./test/setup/dom.ts"],
+          environment: "node",
+          setupFiles: ["./test/setup/console.ts"],
           include: ["test/**/*.test.ts"],
           exclude: [
             "test/package/**",
