@@ -1,4 +1,4 @@
-import { render } from "vitest-browser-vue";
+import { cleanup, render } from "vitest-browser-vue";
 import { nextTick, reactive, type StyleValue, version } from "vue";
 
 import { defaultKeyframes } from "@awesome-reveal/test-utils/entrance-fixtures";
@@ -74,6 +74,16 @@ describe(`v-reveal (Vue ${version})`, () => {
     expect(animate.calls()).toHaveLength(1);
   });
 
+  it("observes the viewport when the value changes to undefined", async () => {
+    const { screen, element } = await mountBox({ when: false });
+    expect(observers.observerOf(element)).toBeUndefined();
+
+    await screen.rerender({ options: undefined });
+    expect(observers.observerOf(element)).toBeDefined();
+    await intersect(element);
+    expect(element).not.toHaveAttribute("data-awesome-reveal");
+  });
+
   it("follows a reactive options object that changes in place", async () => {
     const options = reactive({ when: false });
     const screen = await render(DirectiveBox, { props: { options }, container: createStage() });
@@ -114,9 +124,10 @@ describe(`v-reveal (Vue ${version})`, () => {
   });
 
   it("stops the observation and the animation on unmount", async () => {
-    const { screen, element } = await mountBox();
+    const { element } = await mountBox();
     await intersect(element);
-    await screen.unmount();
+    expect(animate.active()).toHaveLength(1);
+    cleanup();
 
     expect(observers.observerOf(element)).toBeUndefined();
     await expect.poll(() => animate.active()).toHaveLength(0);

@@ -1,4 +1,4 @@
-import { render } from "vitest-browser-vue";
+import { cleanup, render } from "vitest-browser-vue";
 import { defineComponent, h, nextTick, ref, Suspense, version } from "vue";
 
 import { defaultKeyframes } from "@awesome-reveal/test-utils/entrance-fixtures";
@@ -67,14 +67,17 @@ describe(`Reveal (Vue ${version})`, () => {
     vi.spyOn(globalThis, "IntersectionObserver").mockImplementation(function (callback, options) {
       return new Observer((entries, observer) => {
         callback(entries, observer);
-        const element = entries[0]!.target;
-        states.push([element.hasAttribute("data-awesome-reveal"), animate.calls().length]);
+        for (const { isIntersecting, target } of entries) {
+          if (isIntersecting) {
+            states.push([target.hasAttribute("data-awesome-reveal"), animate.calls().length]);
+          }
+        }
       }, options);
     });
     const { element } = await mountReveal();
     await intersect(element);
 
-    expect(states[0]).toEqual([false, 1]);
+    expect(states).toEqual([[false, 1]]);
   });
 
   it("emits reveal with the element, and gives revealed to its slot", async () => {
@@ -227,9 +230,10 @@ describe(`Reveal (Vue ${version})`, () => {
   });
 
   it("stops the observation and the animation on unmount", async () => {
-    const { screen, element } = await mountReveal();
+    const { element } = await mountReveal();
     await intersect(element);
-    await screen.unmount();
+    expect(animate.active()).toHaveLength(1);
+    cleanup();
 
     expect(observers.observerOf(element)).toBeUndefined();
     await expect.poll(() => animate.active()).toHaveLength(0);
