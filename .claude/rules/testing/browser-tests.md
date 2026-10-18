@@ -19,4 +19,4 @@ paths:
   - several entries in one report
   - a threshold that no layout reaches
 - Compare elements, observers and animations by identity: use `expectSame()`, or `toHaveLength()` and then `toBe()`. `toEqual` treats two `IntersectionObserver` or two `Animation` instances as equal, and it compares DOM nodes with `isEqualNode`.
-- Core reports each message one time per module, so a `--repeats` run sees a report only one time. A report test that sets the message adds a counter to it. Leave out a test with a message from the browser with `-t`.
+- Core reports each message one time per module, so a `--repeats` run sees a report only one time. In a `--repeats` run, use `-t` to leave out the report tests that check a message from the browser. You cannot add a counter to these messages.
