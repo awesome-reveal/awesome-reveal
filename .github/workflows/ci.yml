@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     # The image has the browsers and their system packages. Its tag must match the playwright version in pnpm-lock.yaml.
     container:
-      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
       options: --user 1001
     timeout-minutes: 10
     permissions:
@@ -75,7 +75,7 @@ jobs:
     name: Test (${{ matrix.name }})
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
       options: --user 1001
     timeout-minutes: 10
     permissions:
