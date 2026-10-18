@@ -51,6 +51,13 @@
     "*.css"
   ],
   "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "reveal.css": [
+        "dist/reveal.css.d.ts"
+      ]
+    }
+  },
   "imports": {
     "#reveal-style.css": {
       "node": {
@@ -79,15 +86,15 @@
   },
   "scripts": {
     "build": "tsc --noEmit && vite build",
-    "check:package": "tsc -p test/package && publint --strict && attw --pack . --profile esm-only"
+    "check:package": "tsc -p test/package && publint --strict && attw --pack . --ignore-rules cjs-resolves-to-esm"
   },
   "dependencies": {
     "@awesome-reveal/core": "workspace:^"
   },
   "devDependencies": {
-    "vitest-browser-vue": "^3.1.0",
+    "vitest-browser-vue": "catalog:",
     "vue": "catalog:",
-    "vue-tsc": "^3.3.13"
+    "vue-tsc": "catalog:"
   },
   "peerDependencies": {
     "vue": "^3.5.0"
