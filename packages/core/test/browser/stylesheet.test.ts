@@ -205,6 +205,8 @@ describe("reveal.css", () => {
 
   // WebKit does not Tab to buttons and links by default, so the tests use inputs.
   describe("keyboard", () => {
+    // WebKit scrolls to a focused element after a rendering update, so a Tab can scroll the next test.
+    afterEach(settle);
     beforeEach(() => {
       document.body.innerHTML = `<input id="before"><div style="height: 150vh"></div><div id="target" data-awesome-reveal="hidden"><input id="field"></div><div style="height: 150vh"></div>`;
       scrollTo(0, 0);

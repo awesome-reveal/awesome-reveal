@@ -44,6 +44,11 @@ export function collectWindowErrors(): () => unknown[] {
   };
 }
 
+/** Vitest relays a window error before any listener runs, so the console setup can forget the messages after each test. */
+export function forgetCollectedWindowErrors(): void {
+  collectedMessages.clear();
+}
+
 export function isCollectedWindowError(args: unknown[]): boolean {
   const [error] = args;
   return args.length === 1 && error instanceof Error && collectedMessages.has(error.message);

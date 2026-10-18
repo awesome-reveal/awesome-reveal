@@ -57,7 +57,8 @@ const entry = (
 describe("zero-CSS reveal", () => {
   it("applies the first frame immediately and reveals the resting author style", async () => {
     const styles = document.querySelectorAll("style").length;
-    track(reveal(target));
+    const handle = track(reveal(target));
+    expect(Object.keys(handle)).toEqual(["dispose"]);
     expect(opacity()).toBe("0");
     expect(target.style.cssText).toBe("height: 100px;");
     expect(document.querySelectorAll("style").length).toBe(styles);
@@ -292,11 +293,13 @@ describe("zero-CSS reveal", () => {
     expect(await reports()).toEqual([expect.any(TypeError)]);
   });
   it("reduced motion immediately exposes generated, native and delayed entrances", async () => {
+    const observers = trackObservers();
     await setReducedMotion("reduce");
     track(reveal(target, { ...native, delay: 60_000 }));
     track(reveal(target.firstElementChild!));
     expect(opacity()).toBe("1");
     expect(target.getAnimations({ subtree: true })).toEqual([]);
+    expect(observers.live()).toHaveLength(0);
   });
   it("print shows the waiting entrances, and the reveal still plays after the print", async () => {
     track(reveal(target, native));
@@ -353,8 +356,10 @@ describe("reveal", () => {
     expect(animation().effect!.getTiming().duration).toBe(500);
   });
   it("waits for the threshold when the element can reach it in the viewport", async () => {
+    const observers = trackObservers();
     target.style.height = "150vh";
     track(reveal(target, { ...native, threshold: 0.5 }));
+    expect(observers.observerOf(target)!.thresholds).toEqual([0, 0.5]);
     showPart(target, 0.3);
     await settle();
     expect(animation().playState).toBe("paused");
@@ -578,8 +583,10 @@ describe("cascade", () => {
     expect(animate.calls()).toEqual([]);
   });
   it("reduced motion bypasses every child delay", async () => {
+    const observers = trackObservers();
     await setReducedMotion("reduce");
     track(cascade(target, { ...native, interval: 10_000 }));
+    expect(observers.live()).toHaveLength(0);
     expect(target.getAnimations({ subtree: true })).toEqual([]);
     expect(Array.from(target.children).map((c) => getComputedStyle(c).opacity)).toEqual([
       "1",

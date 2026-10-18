@@ -10,14 +10,19 @@ describe("report", () => {
     const reports = collectReports();
     const error = new Error("report from a microtask");
     report(error);
-    expect(await reports()).toEqual([error]);
+    const errors = await reports();
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toBe(error);
   });
 
   it("reports a message only once", async () => {
     const reports = collectReports();
+    const first = new Error("report once");
+    report(first);
     report(new Error("report once"));
-    report(new Error("report once"));
-    expect(await reports()).toHaveLength(1);
+    const errors = await reports();
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toBe(first);
   });
 
   it("reports a value that is not an Error by its string", async () => {

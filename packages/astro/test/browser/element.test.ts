@@ -32,10 +32,10 @@ function connect(options: object, when?: string) {
   return { host, element: host.firstElementChild as HTMLElement };
 }
 
-// The TypeScript DOM lib does not have moveBefore() yet.
+// The TypeScript DOM lib does not declare moveBefore().
 type MovableParent = ParentNode & { moveBefore(node: Node, child: Node | null): void };
 
-// WebKit has no moveBefore(). The callback is what the browser calls instead of the disconnection.
+// WebKit has no moveBefore(), so the test calls the callback that a move calls in its place.
 function move(host: RevealElement) {
   if ("moveBefore" in Element.prototype) (host.parentNode as MovableParent).moveBefore(host, null);
   else host.connectedMoveCallback();

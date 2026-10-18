@@ -9,7 +9,6 @@ import { expectSame, trackAnimations, trackObservers } from "./spies";
 export type ContractOptions = CascadeOptions;
 
 export interface MountInit {
-  /** The element that the harness renders into. */
   container: HTMLElement;
   style?: Partial<CSSStyleDeclaration>;
 }

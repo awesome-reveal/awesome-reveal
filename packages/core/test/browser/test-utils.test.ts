@@ -1,12 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { createStage } from "@awesome-reveal/test-utils/layout";
+import { createStage, showPart } from "@awesome-reveal/test-utils/layout";
 import { setReducedMotion } from "@awesome-reveal/test-utils/reduced-motion";
 import { collectWindowErrors, isCollectedWindowError } from "@awesome-reveal/test-utils/reports";
 import {
+  expectSame,
   interceptObserver,
   trackAnimations,
   trackObservers,
+  withoutAnimate,
 } from "@awesome-reveal/test-utils/spies";
 
 describe("test-utils in a browser", () => {
@@ -51,10 +53,33 @@ describe("test-utils in a browser", () => {
     const observer = new IntersectionObserver(() => {});
     observer.observe(element);
     expect(tracker.observerOf(element)).toBe(observer);
-    expect(tracker.live()).toEqual([observer]);
+    expectSame(tracker.live(), [observer]);
     observer.disconnect();
     expect(tracker.observerOf(element)).toBeUndefined();
-    expect(tracker.live()).toEqual([]);
+    expect(tracker.live()).toHaveLength(0);
+  });
+  it("trackObservers forgets an unobserved element and calls the real unobserve", () => {
+    const tracker = trackObservers();
+    const element = createStage();
+    const observer = new IntersectionObserver(() => {});
+    observer.observe(element);
+    observer.unobserve(element);
+    expect(tracker.observerOf(element)).toBeUndefined();
+  });
+  it("showPart scrolls so that the given fraction of the element is visible", () => {
+    const stage = createStage();
+    stage.style.height = "200px";
+    showPart(stage, 0.5);
+    const { top } = stage.getBoundingClientRect();
+    expect(top).toBeCloseTo(innerHeight - 100, 0);
+  });
+  it("withoutAnimate removes animate", () => {
+    withoutAnimate();
+    expect(createStage().animate).toBeUndefined();
+  });
+  // Runs after the test above in the same page, so it proves that the console setup restores animate.
+  it("animate is back after withoutAnimate", () => {
+    expect(createStage().animate).toBeTypeOf("function");
   });
   it("interceptObserver sends entries to the callback of the last real observer", () => {
     const report = interceptObserver();
@@ -67,7 +92,7 @@ describe("test-utils in a browser", () => {
     report(entry, entry);
     expect(first).not.toHaveBeenCalled();
     expect(last).toHaveBeenCalledOnce();
-    expect(last.mock.calls[0]![0]).toEqual([entry, entry]);
+    expectSame(last.mock.calls[0]![0], [entry, entry]);
     expect(last.mock.calls[0]![1]).toBe(observer);
   });
   it("the console setup accepts only the relay of a collected window error", async () => {
@@ -82,8 +107,10 @@ describe("test-utils in a browser", () => {
         },
       );
     }
-    document.body.append(document.createElement("x-throws"));
-    expect(stop()).toEqual([expect.any(SyntaxError)]);
+    const element = document.body.appendChild(document.createElement("x-throws"));
+    const errors = stop();
+    element.remove();
+    expect(errors).toEqual([expect.any(SyntaxError)]);
 
     const calls = () => vi.mocked(console.error).mock.calls;
     await expect.poll(() => calls().filter(isCollectedWindowError).length).toBe(1);

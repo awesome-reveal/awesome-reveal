@@ -30,8 +30,10 @@ export function trackAnimations() {
     },
     rejectEasing(easing: string, error: Error) {
       spy.mockImplementation(function (this: Element, ...args) {
-        const [keyframes, options] = args as [Keyframe[], KeyframeAnimationOptions | undefined];
-        if ([...keyframes, options].some((value) => value?.easing === easing)) throw error;
+        const [keyframes, options] = args;
+        const frames = Array.isArray(keyframes) ? (keyframes as Keyframe[]) : [];
+        const timing = typeof options === "object" ? options : undefined;
+        if ([...frames, timing].some((value) => value?.easing === easing)) throw error;
         return animate.apply(this, args);
       });
     },
@@ -53,7 +55,7 @@ export function expectSame(actual: readonly unknown[], expected: readonly unknow
 }
 
 export function trackObservers() {
-  const { observe, disconnect } = IntersectionObserver.prototype;
+  const { observe, unobserve, disconnect } = IntersectionObserver.prototype;
   const observed = new Map<IntersectionObserver, Set<Element>>();
   vi.spyOn(IntersectionObserver.prototype, "observe").mockImplementation(function (
     this: IntersectionObserver,
@@ -61,6 +63,13 @@ export function trackObservers() {
   ) {
     observed.set(this, (observed.get(this) ?? new Set()).add(element));
     return observe.call(this, element);
+  });
+  vi.spyOn(IntersectionObserver.prototype, "unobserve").mockImplementation(function (
+    this: IntersectionObserver,
+    element,
+  ) {
+    observed.get(this)?.delete(element);
+    return unobserve.call(this, element);
   });
   vi.spyOn(IntersectionObserver.prototype, "disconnect").mockImplementation(function (
     this: IntersectionObserver,
