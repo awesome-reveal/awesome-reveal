@@ -8,23 +8,23 @@ export interface AnimateCall {
 export function trackAnimations() {
   const animate = Element.prototype.animate;
   const spy = vi.spyOn(Element.prototype, "animate");
+  const calls = (): AnimateCall[] =>
+    spy.mock.results.flatMap((result, index) =>
+      result.type === "return"
+        ? [
+            {
+              element: spy.mock.contexts[index] as Element,
+              keyframes: spy.mock.calls[index]![0] as Keyframe[],
+              options: spy.mock.calls[index]![1] as KeyframeAnimationOptions,
+              animation: result.value,
+            },
+          ]
+        : [],
+    );
   return {
-    calls(): AnimateCall[] {
-      return spy.mock.results.flatMap((result, index) =>
-        result.type === "return"
-          ? [
-              {
-                element: spy.mock.contexts[index] as Element,
-                keyframes: spy.mock.calls[index]![0] as Keyframe[],
-                options: spy.mock.calls[index]![1] as KeyframeAnimationOptions,
-                animation: result.value,
-              },
-            ]
-          : [],
-      );
-    },
+    calls,
     active(): Animation[] {
-      return this.calls()
+      return calls()
         .map((call) => call.animation)
         .filter((animation) => animation.playState !== "idle");
     },
@@ -36,6 +36,20 @@ export function trackAnimations() {
       });
     },
   };
+}
+
+/** Ends the active entrances, so that a test reads the final style and does not wait for the duration. */
+export function finishEntrances(animate: ReturnType<typeof trackAnimations>): void {
+  for (const animation of animate.active()) animation.finish();
+}
+
+/**
+ * Compares each item by identity. `toEqual` compares DOM nodes with `isEqualNode`, so two different
+ * elements with the same markup are equal for it.
+ */
+export function expectSame(actual: readonly unknown[], expected: readonly unknown[]): void {
+  expect(actual).toHaveLength(expected.length);
+  actual.forEach((item, index) => expect(item).toBe(expected[index]));
 }
 
 export function trackObservers() {

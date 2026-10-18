@@ -10,9 +10,15 @@ import {
 import { render } from "vitest-browser-react";
 
 import { defaultKeyframes } from "@awesome-reveal/test-utils/entrance-fixtures";
-import { createStage, scrollIntoView, settle, showPart } from "@awesome-reveal/test-utils/layout";
+import { createStage, intersect, settle, showPart } from "@awesome-reveal/test-utils/layout";
 import { setReducedMotion } from "@awesome-reveal/test-utils/reduced-motion";
-import { trackAnimations, trackObservers, withoutAnimate } from "@awesome-reveal/test-utils/spies";
+import {
+  expectSame,
+  finishEntrances,
+  trackAnimations,
+  trackObservers,
+  withoutAnimate,
+} from "@awesome-reveal/test-utils/spies";
 
 import { type RevealOptions, useReveal } from "../../src/useReveal";
 import { useCascade } from "../../src/useCascade";
@@ -23,10 +29,6 @@ let observers: ReturnType<typeof trackObservers>;
 beforeEach(() => {
   animate = trackAnimations();
   observers = trackObservers();
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
 });
 
 function Box(props: Partial<RevealOptions>) {
@@ -48,16 +50,6 @@ function box(): HTMLElement {
   return document.querySelector<HTMLElement>('[data-testid="box"]')!;
 }
 
-async function intersect(element: HTMLElement) {
-  scrollIntoView(element);
-  await expect.element(element).not.toHaveAttribute("data-awesome-reveal");
-}
-
-// The entrance runs for its full duration, so the test ends it to read the final style.
-function finishEntrances() {
-  for (const animation of animate.active()) animation.finish();
-}
-
 describe(`useReveal (React ${version})`, () => {
   it("hides the element until it enters the viewport", async () => {
     await show(<Box />);
@@ -70,13 +62,13 @@ describe(`useReveal (React ${version})`, () => {
   it("reveals and animates the element when it enters the viewport", async () => {
     await show(<Box />);
     await intersect(box());
-    finishEntrances();
+    finishEntrances(animate);
 
     expect(box()).toHaveStyle({ opacity: "1" });
     await expect.element(box()).toHaveAttribute("data-revealed", "true");
     expect(animate.calls()).toHaveLength(1);
+    expect(animate.calls()[0]!.element).toBe(box());
     expect(animate.calls()[0]).toMatchObject({
-      element: box(),
       keyframes: defaultKeyframes,
       options: { duration: 600, delay: 0, fill: "backwards" },
     });
@@ -91,7 +83,7 @@ describe(`useReveal (React ${version})`, () => {
 
     showPart(box(), 0.6);
     await expect.element(box()).not.toHaveAttribute("data-awesome-reveal");
-    finishEntrances();
+    finishEntrances(animate);
     expect(box()).toHaveStyle({ opacity: "1" });
   });
 
@@ -149,7 +141,7 @@ describe(`useReveal (React ${version})`, () => {
     expect(box()).toHaveStyle({ opacity: "0" });
 
     await rerender(<Box when />);
-    finishEntrances();
+    finishEntrances(animate);
     expect(box()).toHaveStyle({ opacity: "1" });
     expect(animate.calls()).toHaveLength(1);
   });
@@ -165,7 +157,7 @@ describe(`useReveal (React ${version})`, () => {
   it("reveals the element when IntersectionObserver is not available", async () => {
     vi.stubGlobal("IntersectionObserver", undefined);
     await show(<Box />);
-    finishEntrances();
+    finishEntrances(animate);
 
     expect(box()).toHaveStyle({ opacity: "1" });
   });
@@ -197,7 +189,10 @@ describe(`useReveal (React ${version})`, () => {
       </StrictMode>,
     );
 
-    expect(onReveal.mock.calls).toEqual([[box()]]);
+    expectSame(
+      onReveal.mock.calls.map(([element]) => element),
+      [box()],
+    );
   });
 
   it("plays the entrance on a new element when `when` turns true as the old one unmounts", async () => {
@@ -209,7 +204,10 @@ describe(`useReveal (React ${version})`, () => {
     await rerender(<Toggle show={false} when />);
     await rerender(<Toggle show when />);
 
-    expect(animate.calls().map(({ element }) => element)).toEqual([box()]);
+    expectSame(
+      animate.calls().map(({ element }) => element),
+      [box()],
+    );
   });
 
   it("plays the entrance of a new element with the options of the same commit", async () => {
@@ -266,8 +264,12 @@ describe(`useReveal (React ${version})`, () => {
         expect(observers.observerOf(box())).toBeDefined();
         await intersect(box());
       } else expect(observers.observerOf(box())).toBeUndefined();
-      expect(onReveal).toHaveBeenCalledExactlyOnceWith(box());
-      expect(animate.calls().map(({ element }) => element)).toEqual(
+      expectSame(
+        onReveal.mock.calls.map(([element]) => element),
+        [box()],
+      );
+      expectSame(
+        animate.calls().map(({ element }) => element),
         useTarget === useCascade ? Array.from(box().children) : [box()],
       );
       await screen.unmount();

@@ -1,8 +1,8 @@
 import { type ReactElement, version } from "react";
 import { hydrateRoot, type Root } from "react-dom/client";
 
-import { createStage, scrollIntoView } from "@awesome-reveal/test-utils/layout";
-import { trackAnimations } from "@awesome-reveal/test-utils/spies";
+import { createStage, intersect } from "@awesome-reveal/test-utils/layout";
+import { expectSame, finishEntrances, trackAnimations } from "@awesome-reveal/test-utils/spies";
 
 import { Cascade, Reveal } from "../../src/Reveal";
 import { useCascade } from "../../src/useCascade";
@@ -45,16 +45,6 @@ async function hydrate(html: string, tree: ReactElement) {
   return element;
 }
 
-async function intersect(element: HTMLElement) {
-  scrollIntoView(element);
-  await expect.element(element).not.toHaveAttribute("data-awesome-reveal");
-}
-
-// The entrance runs for its full duration, so the test ends it to read the final style.
-function finishEntrances() {
-  for (const animation of animate.active()) animation.finish();
-}
-
 // The setup fails the test on a hydration mismatch warning.
 describe(`hydration (React ${version})`, () => {
   afterEach(() => {
@@ -69,7 +59,7 @@ describe(`hydration (React ${version})`, () => {
     expect(element).toHaveStyle({ opacity: "0" });
     expect(animate.calls()).toHaveLength(0);
     await intersect(element);
-    finishEntrances();
+    finishEntrances(animate);
     expect(element).not.toHaveAttribute("data-awesome-reveal");
     expect(element).toHaveStyle({ opacity: "1" });
     expect(animate.calls()).toHaveLength(1);
@@ -84,7 +74,7 @@ describe(`hydration (React ${version})`, () => {
     expect(element).toHaveStyle({ opacity: "0" });
     expect(animate.calls()).toHaveLength(0);
     await intersect(element);
-    finishEntrances();
+    finishEntrances(animate);
     expect(element).not.toHaveAttribute("data-awesome-reveal");
     expect(element).toHaveStyle({ opacity: "1" });
     expect(animate.calls()).toHaveLength(1);
@@ -97,7 +87,10 @@ describe(`hydration (React ${version})`, () => {
     );
 
     expect(element).not.toHaveAttribute("data-awesome-reveal");
-    expect(animate.calls().map((call) => call.element)).toEqual([element]);
+    expectSame(
+      animate.calls().map((call) => call.element),
+      [element],
+    );
   });
 
   it("hydrates useReveal with when hidden, then plays the entrance once", async () => {
@@ -107,7 +100,10 @@ describe(`hydration (React ${version})`, () => {
     );
 
     expect(element).not.toHaveAttribute("data-awesome-reveal");
-    expect(animate.calls().map((call) => call.element)).toEqual([element]);
+    expectSame(
+      animate.calls().map((call) => call.element),
+      [element],
+    );
   });
 
   const CascadeBox = () => (
@@ -130,9 +126,12 @@ describe(`hydration (React ${version})`, () => {
     expect(element).toHaveStyle({ opacity: "1" });
     expect(children[0]).toHaveStyle({ opacity: "0" });
     await intersect(element);
-    finishEntrances();
+    finishEntrances(animate);
     expect(element).not.toHaveAttribute("data-awesome-reveal");
     expect(children[0]).toHaveStyle({ opacity: "1" });
-    expect(animate.calls().map((call) => call.element)).toEqual(children);
+    expectSame(
+      animate.calls().map((call) => call.element),
+      children,
+    );
   });
 });

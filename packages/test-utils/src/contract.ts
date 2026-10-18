@@ -1,10 +1,10 @@
 import type { CascadeOptions } from "@awesome-reveal/core/adapter";
 
 import { easing } from "./entrance-fixtures";
-import { createStage, scrollIntoView, scrollToTop, settle, showPart } from "./layout";
+import { createStage, intersect, scrollToTop, settle, showPart } from "./layout";
 import { setReducedMotion } from "./reduced-motion";
-import { collectWindowErrors } from "./reports";
-import { trackAnimations, trackObservers } from "./spies";
+import { collectReports, collectWindowErrors } from "./reports";
+import { expectSame, trackAnimations, trackObservers } from "./spies";
 
 export type ContractOptions = CascadeOptions;
 
@@ -45,24 +45,6 @@ const focusChild = (m: Mounted, index = 0) => {
   expect(m.element().getBoundingClientRect().top).toBeGreaterThan(innerHeight);
 };
 
-// Reports throw from a microtask. The wrapper runs each microtask at once, because React `act` and the
-// adapters schedule their own work with `queueMicrotask`.
-function collectReports() {
-  const errors: unknown[] = [];
-  const original = globalThis.queueMicrotask;
-  vi.stubGlobal("queueMicrotask", (callback: VoidFunction) =>
-    original(() => {
-      try {
-        callback();
-      } catch (error) {
-        errors.push(error);
-      }
-    }),
-  );
-  return errors;
-}
-
-// Core reports a message one time per page, and `--repeats` runs the tests again in the same page.
 let run = 0;
 
 function createMount(harness: Harness) {
@@ -71,7 +53,6 @@ function createMount(harness: Harness) {
   afterEach(async () => {
     await current?.unmount();
     current = undefined;
-    vi.unstubAllGlobals();
     document.body.innerHTML = "";
   });
 
@@ -94,19 +75,6 @@ export function describeContract(name: string, harness: Harness) {
 
     const rerender = (m: Mounted, options: ContractOptions) => m.rerender(options);
 
-    async function intersect(m: Mounted, visible: boolean | number) {
-      if (visible === true) {
-        scrollIntoView(m.element());
-        await expect.element(m.element()).not.toHaveAttribute("data-awesome-reveal", "hidden");
-      } else if (visible === false) {
-        scrollToTop();
-        await settle();
-      } else {
-        showPart(m.element(), visible);
-        await settle();
-      }
-    }
-
     it("hides the element at the start", async () => {
       const m = await mount();
       expect(hidden(m.element())).toBe(true);
@@ -116,9 +84,12 @@ export function describeContract(name: string, harness: Harness) {
 
     it("reveals once on intersect", async () => {
       const m = await mount();
-      await intersect(m, true);
+      await intersect(m.element());
       expect(shown(m.element())).toBe(true);
-      expect(animate.calls().map((a) => a.element)).toEqual([m.element()]);
+      expectSame(
+        animate.calls().map((a) => a.element),
+        [m.element()],
+      );
       expect(observers.observerOf(m.element())).toBeUndefined();
     });
 
@@ -143,7 +114,7 @@ export function describeContract(name: string, harness: Harness) {
     it("when: null observes", async () => {
       const m = await mount({ when: null });
       expect(observers.observerOf(m.element())).toBeDefined();
-      await intersect(m, true);
+      await intersect(m.element());
       expect(shown(m.element())).toBe(true);
     });
 
@@ -171,7 +142,8 @@ export function describeContract(name: string, harness: Harness) {
 
     it("reveals when the element leaves before it reaches the threshold", async () => {
       const m = await mount({ threshold: 0.5 });
-      await intersect(m, 0.2);
+      showPart(m.element(), 0.2);
+      await settle();
       expect(hidden(m.element())).toBe(true);
       scrollToTop();
       await expect.element(m.element()).not.toHaveAttribute("data-awesome-reveal");
@@ -184,7 +156,7 @@ export function describeContract(name: string, harness: Harness) {
       const before = observers.observerOf(m.element());
       await rerender(m, { duration: 400 });
       expect(observers.observerOf(m.element())).toBe(before);
-      await intersect(m, true);
+      await intersect(m.element());
       await rerender(m, { duration: 500 });
       expect(animate.calls()).toHaveLength(1);
       expect(animate.calls()[0]!.options).toMatchObject({ duration: 400 });
@@ -223,7 +195,7 @@ export function describeContract(name: string, harness: Harness) {
     it("reduced motion shows the element with no animation, also with a delay", async () => {
       await setReducedMotion("reduce");
       const m = await mount({ delay: 60_000 });
-      await intersect(m, true);
+      await intersect(m.element());
       expect(shown(m.element())).toBe(true);
       expect(animate.calls()).toHaveLength(0);
     });
@@ -240,14 +212,14 @@ export function describeContract(name: string, harness: Harness) {
     it("the reveal keeps the inline style of the user", async () => {
       const m = await mount({}, { style: { opacity: "0.5", color: "red" } });
       expect(m.element().style.opacity).toBe("0.5");
-      await intersect(m, true);
+      await intersect(m.element());
       expect(m.element().style.opacity).toBe("0.5");
       expect(m.element().style.color).toBe("red");
     });
 
     it("unmount cancels the animation and the observer", async () => {
       const m = await mount();
-      await intersect(m, true);
+      await intersect(m.element());
       await m.unmount();
       await expect.poll(() => animate.active()).toHaveLength(0);
       expect(observers.live()).toHaveLength(0);
@@ -260,7 +232,7 @@ export function describeContract(name: string, harness: Harness) {
           : "a new element after the reveal does not replay",
         async () => {
           const m = await mount();
-          await intersect(m, true);
+          await intersect(m.element());
           const old = m.element();
           await m.replaceNode?.();
           expect(m.element()).not.toBe(old);
@@ -287,7 +259,10 @@ export function describeContract(name: string, harness: Harness) {
         const m = await mount({ when: false });
         await m.replaceNode?.({ when: true });
         expect(shown(m.element())).toBe(true);
-        expect(animate.calls().map((a) => a.element)).toEqual([m.element()]);
+        expectSame(
+          animate.calls().map((a) => a.element),
+          [m.element()],
+        );
         expect(animate.active()).toHaveLength(1);
       });
     }
@@ -296,8 +271,11 @@ export function describeContract(name: string, harness: Harness) {
       const onReveal = vi.fn();
       const m = await mount({ onReveal });
       expect(onReveal).not.toHaveBeenCalled();
-      await intersect(m, true);
-      expect(onReveal.mock.calls).toEqual([[m.element()]]);
+      await intersect(m.element());
+      expectSame(
+        onReveal.mock.calls.map(([element]) => element),
+        [m.element()],
+      );
       await rerender(m, { when: false, onReveal });
       await rerender(m, { when: true, onReveal });
       expect(onReveal).toHaveBeenCalledTimes(2);
@@ -308,7 +286,7 @@ export function describeContract(name: string, harness: Harness) {
       const onReveal = (element: Element) =>
         attributes.push(element.getAttribute("data-awesome-reveal"));
       const m = await mount({ onReveal });
-      await intersect(m, true);
+      await intersect(m.element());
       await rerender(m, { when: false, onReveal });
       expect(hidden(m.element())).toBe(true);
       await rerender(m, { when: true, onReveal });
@@ -317,7 +295,7 @@ export function describeContract(name: string, harness: Harness) {
 
     it("direction builds the entrance", async () => {
       const m = await mount({ from: "left" });
-      await intersect(m, true);
+      await intersect(m.element());
       const [, move] = animate.calls()[0]!.keyframes;
       expect(move).toMatchObject({ translate: "-24px 0px" });
       expect(move!.easing).toBe(easing);
@@ -327,7 +305,7 @@ export function describeContract(name: string, harness: Harness) {
       const m = await mount();
       const element = m.element();
       expect(element.hasAttribute("data-awesome-reveal-attached")).toBe(true);
-      await intersect(m, true);
+      await intersect(m.element());
       expect(element.hasAttribute("data-awesome-reveal-attached")).toBe(true);
       await m.unmount();
       await expect.poll(() => element.hasAttribute("data-awesome-reveal-attached")).toBe(false);
@@ -341,7 +319,10 @@ export function describeContract(name: string, harness: Harness) {
       expect(shown(m.element())).toBe(true);
       expect(observers.observerOf(m.element())).toBeUndefined();
       expect(animate.calls()).toHaveLength(0);
-      expect(onReveal.mock.calls).toEqual([[m.element()]]);
+      expectSame(
+        onReveal.mock.calls.map(([element]) => element),
+        [m.element()],
+      );
     });
 
     it("a reveal of an element that contains focus plays no entrance", async () => {
@@ -416,7 +397,6 @@ export function describeContract(name: string, harness: Harness) {
     });
 
     it("a throwing IntersectionObserver shows the element", async () => {
-      // A test file can run more than one harness, and core reports each message only one time per page.
       const message = `Invalid threshold: ${name} ${++run}`;
       vi.stubGlobal(
         "IntersectionObserver",
@@ -438,7 +418,7 @@ export function describeContract(name: string, harness: Harness) {
       }
       expect(thrown).toBeUndefined();
       expect(windowErrors).toEqual([]);
-      expect(reports).toEqual([new SyntaxError(message)]);
+      expect(await reports()).toEqual([new SyntaxError(message)]);
       const element = document.querySelector<HTMLElement>("[data-contract]");
       expect(element && shown(element)).toBe(true);
     });
@@ -449,12 +429,12 @@ export function describeContract(name: string, harness: Harness) {
       const keyframes = [{ opacity: 0, easing: "bogus" }, { opacity: 1 }];
       const reports = collectReports();
       const m = await mount({ keyframes });
-      await intersect(m, true);
+      await intersect(m.element());
       await rerender(m, { when: false, keyframes });
       await rerender(m, { when: true, keyframes });
       await settle();
       expect(shown(m.element())).toBe(true);
-      expect(reports).toEqual([new TypeError(message)]);
+      expect(await reports()).toEqual([new TypeError(message)]);
     });
   });
 }
@@ -470,7 +450,6 @@ export function describeCascadeContract(name: string, harness: Harness) {
       animate = trackAnimations();
       observers = trackObservers();
     });
-    const observerOf = (element: Element) => observers.observerOf(element);
 
     const children = (m: Mounted) => Array.from(m.element().children);
     const delays = () => animate.calls().map((call) => call.options.delay);
@@ -479,17 +458,19 @@ export function describeCascadeContract(name: string, harness: Harness) {
       const m = await mount();
       expect(m.element().getAttribute("data-awesome-reveal")).toBe("cascade");
       expect(animate.calls()).toHaveLength(0);
-      expect(observerOf(m.element())).toBeDefined();
+      expect(observers.observerOf(m.element())).toBeDefined();
     });
 
     it("reveals the direct children in sequence on intersect", async () => {
       const m = await mount();
-      scrollIntoView(m.element());
-      await expect.element(m.element()).not.toHaveAttribute("data-awesome-reveal", "cascade");
+      await intersect(m.element());
       expect(shown(m.element())).toBe(true);
-      expect(animate.calls().map((a) => a.element)).toEqual(children(m));
+      expectSame(
+        animate.calls().map((a) => a.element),
+        children(m),
+      );
       expect(delays()).toEqual([0, 80, 160]);
-      expect(observerOf(m.element())).toBeUndefined();
+      expect(observers.observerOf(m.element())).toBeUndefined();
     });
 
     it("interval sets the delay between the children", async () => {
@@ -534,7 +515,10 @@ export function describeCascadeContract(name: string, harness: Harness) {
     it("onReveal is called with the container", async () => {
       const onReveal = vi.fn();
       const m = await mount({ onReveal, when: true });
-      expect(onReveal.mock.calls).toEqual([[m.element()]]);
+      expectSame(
+        onReveal.mock.calls.map(([element]) => element),
+        [m.element()],
+      );
     });
 
     it("onReveal sees the container without the hidden attribute", async () => {

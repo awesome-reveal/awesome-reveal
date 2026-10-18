@@ -1,19 +1,23 @@
 /**
- * Holds the microtasks that report errors, and returns a function that runs them and gives the thrown errors.
- * Core reports each message only one time per module, so each test needs its own message.
+ * Collects the errors that microtasks throw, such as the reports of core, and returns an async function
+ * that gives them after the queued microtasks ran. The wrapper runs each microtask at once, because
+ * React `act` and the adapters schedule their own work with `queueMicrotask`.
+ * Core reports each message only one time per module, so each test and each repeat needs its own message.
  */
-export function collectReports(): () => unknown[] {
-  const callbacks: VoidFunction[] = [];
-  vi.stubGlobal("queueMicrotask", (callback: VoidFunction) => callbacks.push(callback));
-  return () => {
-    const errors: unknown[] = [];
-    for (const callback of callbacks) {
+export function collectReports(): () => Promise<unknown[]> {
+  const errors: unknown[] = [];
+  const original = globalThis.queueMicrotask;
+  vi.stubGlobal("queueMicrotask", (callback: VoidFunction) =>
+    original(() => {
       try {
         callback();
       } catch (error) {
         errors.push(error);
       }
-    }
+    }),
+  );
+  return async () => {
+    await new Promise((resolve) => setTimeout(resolve));
     return errors;
   };
 }

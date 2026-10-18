@@ -14,6 +14,12 @@ export function scrollIntoView(element: Element) {
   element.scrollIntoView({ block: "center" });
 }
 
+/** Scrolls the element into view, and waits until it reveals. */
+export async function intersect(element: HTMLElement): Promise<void> {
+  scrollIntoView(element);
+  await expect.element(element).not.toHaveAttribute("data-awesome-reveal");
+}
+
 export function showPart(element: Element, fraction: number) {
   const { top, height } = element.getBoundingClientRect();
   scrollTo(0, scrollY + top - innerHeight + height * fraction);

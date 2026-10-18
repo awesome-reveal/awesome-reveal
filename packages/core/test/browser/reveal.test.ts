@@ -26,7 +26,6 @@ const track = (handle: RevealHandle) => {
 const opacity = (element: Element = target) => getComputedStyle(element).opacity;
 const animation = (element = target) => element.getAnimations()[0]!;
 const native = { keyframes: [{ opacity: 0 }, { opacity: 1 }], duration: 60_000 };
-// Core reports a message one time per page, so a repeat of a test needs a new message.
 let run = 0;
 
 beforeEach(() => {
@@ -35,7 +34,6 @@ beforeEach(() => {
 });
 afterEach(() => {
   for (const handle of handles) handle.dispose();
-  vi.unstubAllGlobals();
   document.body.innerHTML = "";
 });
 async function enter(element = target) {
@@ -286,12 +284,12 @@ describe("zero-CSS reveal", () => {
       expect(target.getAnimations()).toEqual([]);
     },
   );
-  it("invalid native values fail visible and report the browser error", () => {
+  it("invalid native values fail visible and report the browser error", async () => {
     const reports = collectReports();
     track(reveal(target, { keyframes: [{ opacity: 0, easing: "invalid" }, { opacity: 1 }] }));
     expect(opacity()).toBe("1");
     expect(target.getAnimations()).toEqual([]);
-    expect(reports()).toEqual([expect.any(TypeError)]);
+    expect(await reports()).toEqual([expect.any(TypeError)]);
   });
   it("reduced motion immediately exposes generated, native and delayed entrances", async () => {
     await setReducedMotion("reduce");
@@ -329,11 +327,11 @@ describe("zero-CSS reveal", () => {
     expect(animation().currentTime as number).toBeGreaterThanOrEqual(time);
     expect(animation().currentTime as number).toBeLessThan(60_000);
   });
-  it("invalid thresholds reveal immediately and report the browser error", () => {
+  it("invalid thresholds reveal immediately and report the browser error", async () => {
     const reports = collectReports();
     track(reveal(target, { ...native, threshold: 2 }));
     expect(animation().playState).toBe("running");
-    expect(reports()).toEqual([expect.any(RangeError)]);
+    expect(await reports()).toEqual([expect.any(RangeError)]);
   });
 });
 
@@ -455,7 +453,7 @@ describe("reveal", () => {
     expect(opacity()).toBe("1");
     expect(observers.live()).toEqual([]);
   });
-  it("fails safe and reports when native animation creation throws", () => {
+  it("fails safe and reports when native animation creation throws", async () => {
     const error = new TypeError(`core animate failed ${++run}`);
     trackAnimations().rejectEasing("bogus", error);
     const reports = collectReports();
@@ -464,7 +462,7 @@ describe("reveal", () => {
     ).not.toThrow();
     expect(opacity()).toBe("1");
     expect(target.getAnimations()).toEqual([]);
-    expect(reports()).toEqual([error]);
+    expect(await reports()).toEqual([error]);
   });
   it("exposes content with no WAAPI or IntersectionObserver", () => {
     vi.stubGlobal("IntersectionObserver", undefined);

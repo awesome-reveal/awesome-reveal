@@ -35,6 +35,7 @@ const sources = sourcesFor("react");
 const browserTest = () => ({
   css: { include: [/reveal\.css$/] },
   retry: process.env.CI ? 2 : 0,
+  unstubGlobals: true,
   browser: {
     enabled: true,
     headless: true,
@@ -125,6 +126,10 @@ export default defineConfig({
       {
         root: "packages/react",
         resolve: sourcesFor("react"),
+        // Vite reloads the page in the middle of a run when it finds a new dependency to optimize.
+        optimizeDeps: {
+          include: ["react", "react/jsx-dev-runtime", "react-dom/client", "vitest-browser-react"],
+        },
         test: {
           name: "react:browser",
           include: ["test/browser/**/*.test.{ts,tsx}"],

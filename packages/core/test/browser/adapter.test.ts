@@ -23,7 +23,6 @@ const keep = <Store extends RevealStore>(store: Store) => {
 const opacity = (element: Element = target) => getComputedStyle(element).opacity;
 const animation = (element: Element = target) => element.getAnimations()[0]!;
 const native = { keyframes: [{ opacity: 0 }, { opacity: 1 }], duration: 60_000 };
-// Core reports a message one time per page, so a repeat of a test needs a new message.
 let run = 0;
 const paragraphs = () => Array.from(target.children) as [HTMLElement, HTMLElement, HTMLElement];
 
@@ -33,7 +32,6 @@ beforeEach(() => {
 });
 afterEach(() => {
   for (const store of stores) store.attach(null);
-  vi.unstubAllGlobals();
   document.body.innerHTML = "";
 });
 async function enter(state: RevealStore) {
@@ -318,7 +316,7 @@ it("reports a throwing adapter callback once without breaking the reveal", async
   state.setOptions({ onReveal, when: false });
   state.setOptions({ onReveal, when: true });
   expect(state.revealed).toBe(true);
-  expect(reports()).toEqual([error]);
+  expect(await reports()).toEqual([error]);
 });
 
 describe("createCascade", () => {

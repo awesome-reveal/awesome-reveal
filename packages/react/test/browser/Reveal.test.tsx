@@ -2,8 +2,8 @@ import { createRef, type ReactNode, version } from "react";
 import { render } from "vitest-browser-react";
 
 import { defaultKeyframes, fadeKeyframes } from "@awesome-reveal/test-utils/entrance-fixtures";
-import { createStage, scrollIntoView } from "@awesome-reveal/test-utils/layout";
-import { trackAnimations } from "@awesome-reveal/test-utils/spies";
+import { createStage, intersect } from "@awesome-reveal/test-utils/layout";
+import { expectSame, finishEntrances, trackAnimations } from "@awesome-reveal/test-utils/spies";
 
 import { Reveal } from "../../src/Reveal";
 
@@ -15,16 +15,6 @@ beforeEach(() => {
 
 // The stage is below the fold, so the element reveals only when the test scrolls to it.
 const show = (ui: ReactNode) => render(ui, { container: createStage() });
-
-async function intersect(element: HTMLElement) {
-  scrollIntoView(element);
-  await expect.element(element).not.toHaveAttribute("data-awesome-reveal");
-}
-
-// The entrance runs for its full duration, so the test ends it to read the final style.
-function finishEntrances() {
-  for (const animation of animate.active()) animation.finish();
-}
 
 describe(`Reveal (React ${version})`, () => {
   it("renders one hidden div around its children", async () => {
@@ -49,7 +39,7 @@ describe(`Reveal (React ${version})`, () => {
     const { container } = await show(<Reveal keyframes={fadeKeyframes}>child</Reveal>);
     const element = container.firstElementChild as HTMLElement;
     await intersect(element);
-    finishEntrances();
+    finishEntrances(animate);
 
     expect(element).toHaveStyle({ opacity: "1" });
     expect(element).not.toHaveAttribute("data-awesome-reveal");
@@ -98,7 +88,7 @@ describe(`Reveal (React ${version})`, () => {
     expect(element).toHaveStyle({ color: "rgb(255, 0, 0)", opacity: "0" });
 
     await intersect(element);
-    finishEntrances();
+    finishEntrances(animate);
     expect(element).toHaveStyle({ color: "rgb(255, 0, 0)", opacity: "0.5" });
   });
 
@@ -146,7 +136,10 @@ describe(`Reveal (React ${version})`, () => {
       await intersect(element as HTMLElement);
       await unmount();
 
-      expect(ref.mock.calls).toEqual([[element], [null]]);
+      expectSame(
+        ref.mock.calls.map(([node]) => node),
+        [element, null],
+      );
       expect(animate.calls()[0]?.element).toBe(element);
     });
 
@@ -174,13 +167,16 @@ describe(`Reveal (React ${version})`, () => {
       "runs the cleanup that a callback ref returns",
       async () => {
         const cleanup = vi.fn();
-        const ref = vi.fn(() => cleanup);
+        const ref = vi.fn<(node: HTMLDivElement | null) => VoidFunction>(() => cleanup);
         const { container, unmount } = await show(<Reveal keyframes={fadeKeyframes} ref={ref} />);
         const element = container.firstElementChild!;
 
         await unmount();
 
-        expect(ref.mock.calls).toEqual([[element]]);
+        expectSame(
+          ref.mock.calls.map(([node]) => node),
+          [element],
+        );
         expect(cleanup).toHaveBeenCalledOnce();
       },
     );
