@@ -3,15 +3,15 @@ import { bundleFixture } from "@awesome-reveal/test-utils/bundle";
 it.concurrent.each([
   {
     entry: "reveal.js",
-    animationExports: ["entrances", "motionPreference", "motions"],
+    animationExports: ["entrance", "entrances", "motionPreference", "motions"],
     bytes: 4025,
-    gzip: 1750,
+    gzip: 1800,
   },
   {
     entry: "both.js",
-    animationExports: ["cascadeInterval", "entrances", "motionPreference", "motions"],
+    animationExports: ["cascadeInterval", "entrance", "entrances", "motionPreference", "motions"],
     bytes: 4125,
-    gzip: 1800,
+    gzip: 1830,
   },
 ])(
   "keeps only the imperative modules for $entry",

@@ -4,7 +4,7 @@ import type { CascadeOptions, RevealOptions, StartState } from "./types.js";
 const unit = (value: number | string, suffix: string) =>
   typeof value === "number" ? `${value}${suffix}` : value;
 
-function entrance(options: RevealOptions): Keyframe[] {
+export function entrance(options: RevealOptions): Keyframe[] {
   if (options.keyframes) return options.keyframes;
   const from = options.from ?? "bottom";
   const state: StartState =
