@@ -166,7 +166,7 @@ export default defineConfig({
           environment: "jsdom",
           setupFiles: ["./test/setup/console.ts", "./test/setup/dom.ts"],
           include: ["test/**/*.test.ts"],
-          exclude: ["test/package/**", "test/ssr.test.ts"],
+          exclude: ["test/package/**", "test/browser/**", "test/ssr.test.ts"],
           typecheck: {
             enabled: true,
             // vue-tsc also checks the templates of the .vue files that the tsconfig includes.
@@ -174,6 +174,22 @@ export default defineConfig({
             tsconfig: "./test/tsconfig.json",
             include: ["test/types/**/*.test-d.ts"],
           },
+        },
+      },
+      {
+        root: "packages/vue",
+        // The Vue plugin also defines the Vue feature flags, which the tests without .vue files need.
+        plugins: [vue()],
+        resolve: sourcesFor("vue"),
+        // Vite reloads the page in the middle of a run when it finds a new dependency to optimize.
+        optimizeDeps: {
+          include: ["vue", "vue/server-renderer", "vitest-browser-vue"],
+        },
+        test: {
+          name: "vue:browser",
+          include: ["test/browser/**/*.test.ts"],
+          ...browserTest(),
+          setupFiles: ["./test/setup/console.ts", "./test/setup/browser.ts"],
         },
       },
       {
