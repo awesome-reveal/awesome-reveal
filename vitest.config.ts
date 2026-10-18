@@ -4,6 +4,8 @@ import { playwright } from "@vitest/browser-playwright";
 import vue from "@vitejs/plugin-vue";
 import { coverageConfigDefaults, defineConfig } from "vitest/config";
 
+import { emulateReducedMotion } from "./packages/test-utils/src/commands.ts";
+
 function aliases(entries: [string, string][]) {
   return entries.map(([find, source]) => ({
     find: new RegExp(`^${find}$`),
@@ -15,16 +17,41 @@ const testUtils = aliases([["@awesome-reveal/test-utils/(.+)", "packages/test-ut
 
 // Unit tests run against the sources of the other workspace packages, so no build is necessary first.
 // The :package projects test dist, so they get only the test-utils alias.
-const sources = {
-  alias: [
-    ...aliases([
-      ["@awesome-reveal/core", "packages/core/src/index.ts"],
-      ["@awesome-reveal/core/adapter", "packages/core/src/adapter.ts"],
-      ["#reveal-style.css", "packages/react/src/reveal.css"],
-    ]),
-    ...testUtils,
-  ],
-};
+function sourcesFor(css: "react" | "vue") {
+  return {
+    alias: [
+      ...aliases([
+        ["@awesome-reveal/core", "packages/core/src/index.ts"],
+        ["@awesome-reveal/core/adapter", "packages/core/src/adapter.ts"],
+        ["#reveal-style.css", `packages/${css}/src/reveal.css`],
+      ]),
+      ...testUtils,
+    ],
+  };
+}
+const sources = sourcesFor("react");
+
+// A function, because Vitest writes a name into each browser instance, so two projects cannot share them.
+const browserTest = () => ({
+  css: { include: [/reveal\.css$/] },
+  retry: process.env.CI ? 2 : 0,
+  unstubGlobals: true,
+  browser: {
+    enabled: true,
+    headless: true,
+    provider: playwright(),
+    instances: (["chromium", "firefox", "webkit"] as const)
+      .filter(
+        (browser) =>
+          !process.env.REVEAL_BROWSERS || process.env.REVEAL_BROWSERS.split(",").includes(browser),
+      )
+      .map((browser) => ({ browser })),
+    // The tests scroll by viewport heights.
+    viewport: { width: 1280, height: 720 },
+    trace: "on-first-retry" as const,
+    commands: { emulateReducedMotion },
+  },
+});
 
 const coverageThreshold = { lines: 90, functions: 90, branches: 85, statements: 90 };
 
@@ -67,23 +94,8 @@ export default defineConfig({
         test: {
           name: "core:browser",
           include: ["test/browser/**/*.test.ts"],
-          css: { include: [/reveal\.css$/] },
-          retry: process.env.CI ? 2 : 0,
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: playwright(),
-            instances: (["chromium", "firefox", "webkit"] as const)
-              .filter(
-                (browser) =>
-                  !process.env.REVEAL_BROWSERS ||
-                  process.env.REVEAL_BROWSERS.split(",").includes(browser),
-              )
-              .map((browser) => ({ browser })),
-            // The tests scroll by viewport heights.
-            viewport: { width: 1280, height: 720 },
-            trace: "on-first-retry",
-          },
+          ...browserTest(),
+          setupFiles: ["./test/setup/browser.ts"],
         },
       },
       {
@@ -100,15 +112,29 @@ export default defineConfig({
         resolve: sources,
         test: {
           name: "react:unit",
-          environment: "jsdom",
-          setupFiles: ["./test/setup/console.ts", "./test/setup/dom.ts"],
+          environment: "node",
+          setupFiles: ["./test/setup/console.ts"],
           include: ["test/**/*.test.{ts,tsx}"],
-          exclude: ["test/package/**", "test/ssr.test.tsx"],
+          exclude: ["test/package/**", "test/browser/**", "test/ssr.test.tsx"],
           typecheck: {
             enabled: true,
             tsconfig: "./test/tsconfig.json",
             include: ["test/types/**/*.test-d.{ts,tsx}"],
           },
+        },
+      },
+      {
+        root: "packages/react",
+        resolve: sourcesFor("react"),
+        // Vite reloads the page in the middle of a run when it finds a new dependency to optimize.
+        optimizeDeps: {
+          include: ["react", "react/jsx-dev-runtime", "react-dom/client", "vitest-browser-react"],
+        },
+        test: {
+          name: "react:browser",
+          include: ["test/browser/**/*.test.{ts,tsx}"],
+          ...browserTest(),
+          setupFiles: ["./test/setup/console.ts", "./test/setup/browser.ts"],
         },
       },
       {
@@ -137,10 +163,10 @@ export default defineConfig({
         resolve: sources,
         test: {
           name: "vue:unit",
-          environment: "jsdom",
-          setupFiles: ["./test/setup/console.ts", "./test/setup/dom.ts"],
+          environment: "node",
+          setupFiles: ["./test/setup/console.ts"],
           include: ["test/**/*.test.ts"],
-          exclude: ["test/package/**", "test/ssr.test.ts"],
+          exclude: ["test/package/**", "test/browser/**", "test/ssr.test.ts"],
           typecheck: {
             enabled: true,
             // vue-tsc also checks the templates of the .vue files that the tsconfig includes.
@@ -148,6 +174,22 @@ export default defineConfig({
             tsconfig: "./test/tsconfig.json",
             include: ["test/types/**/*.test-d.ts"],
           },
+        },
+      },
+      {
+        root: "packages/vue",
+        // The Vue plugin also defines the Vue feature flags, which the tests without .vue files need.
+        plugins: [vue()],
+        resolve: sourcesFor("vue"),
+        // Vite reloads the page in the middle of a run when it finds a new dependency to optimize.
+        optimizeDeps: {
+          include: ["vue", "vue/server-renderer", "vitest-browser-vue"],
+        },
+        test: {
+          name: "vue:browser",
+          include: ["test/browser/**/*.test.ts"],
+          ...browserTest(),
+          setupFiles: ["./test/setup/console.ts", "./test/setup/browser.ts"],
         },
       },
       {
@@ -176,10 +218,16 @@ export default defineConfig({
         resolve: sources,
         test: {
           name: "astro:unit",
-          environment: "jsdom",
-          setupFiles: ["./test/setup/console.ts", "./test/setup/dom.ts"],
+          environment: "node",
+          setupFiles: ["./test/setup/console.ts"],
           include: ["test/**/*.test.ts"],
-          exclude: ["test/package/**", "test/e2e/**", "test/ssr.test.ts", "test/build.test.ts"],
+          exclude: [
+            "test/package/**",
+            "test/e2e/**",
+            "test/browser/**",
+            "test/ssr.test.ts",
+            "test/build.test.ts",
+          ],
           typecheck: {
             enabled: true,
             tsconfig: "./test/tsconfig.json",
@@ -187,11 +235,21 @@ export default defineConfig({
           },
         },
       },
+      {
+        root: "packages/astro",
+        resolve: sources,
+        test: {
+          name: "astro:browser",
+          include: ["test/browser/**/*.test.ts"],
+          ...browserTest(),
+          setupFiles: ["./test/setup/console.ts", "./test/setup/browser.ts"],
+        },
+      },
       "packages/astro/vitest.config.ts",
       {
         root: "packages/astro",
         test: {
-          name: "astro:browser",
+          name: "astro:e2e",
           environment: "node",
           include: ["test/e2e/**/*.test.ts"],
           globalSetup: ["./test/e2e/setup.ts"],

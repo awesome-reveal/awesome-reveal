@@ -1,5 +1,5 @@
-import { mount } from "@vue/test-utils";
-import { h, nextTick, shallowRef, type VNode, withDirectives } from "vue";
+import { cleanup, render } from "vitest-browser-vue";
+import { h, nextTick, shallowRef, type StyleValue, type VNode, withDirectives } from "vue";
 
 import {
   type ContractOptions,
@@ -8,12 +8,12 @@ import {
   type Harness,
 } from "@awesome-reveal/test-utils/contract";
 
-import { Cascade, Reveal } from "../src/Reveal";
-import { vCascade, vReveal } from "../src/vReveal";
+import { Cascade, Reveal } from "../../src/Reveal";
+import { vCascade, vReveal } from "../../src/vReveal";
 
 const children = () => [1, 2, 3].map((n) => h("span", n));
 
-type Tree = (options: ContractOptions, style: object | undefined, swap: boolean) => VNode;
+type Tree = (options: ContractOptions, style: StyleValue | undefined, swap: boolean) => VNode;
 
 function harness(tree: Tree): Harness {
   return {
@@ -21,10 +21,10 @@ function harness(tree: Tree): Harness {
     async mount(options, init) {
       const state = shallowRef({ options, swap: false });
       let error: unknown;
-      const wrapper = mount(
-        { render: () => tree(state.value.options, init?.style, state.value.swap) },
+      await render(
+        { render: () => tree(state.value.options, init.style as StyleValue, state.value.swap) },
         {
-          attachTo: document.body,
+          container: init.container,
           global: {
             config: {
               errorHandler: (thrown) => {
@@ -34,23 +34,18 @@ function harness(tree: Tree): Harness {
           },
         },
       );
-      await nextTick();
       if (error) {
-        wrapper.unmount();
+        cleanup();
         throw error;
       }
       return {
-        element: () => document.querySelector<HTMLElement>("[data-contract]")!,
+        element: () => init.container.querySelector<HTMLElement>("[data-contract]")!,
         rerender: async (next) => {
           state.value = { ...state.value, options: next };
           await nextTick();
         },
-        unmount: async () => wrapper.unmount(),
-        flush: () => nextTick(),
-        run: async (fn) => {
-          fn();
-          await nextTick();
-        },
+        // screen.unmount() keeps the wrapper in the list of the library, so its next cleanup() unmounts the app again.
+        unmount: async () => cleanup(),
         replaceNode: async (next) => {
           state.value = { options: next ?? state.value.options, swap: true };
           await nextTick();

@@ -74,9 +74,18 @@ jobs:
   framework:
     name: Test (${{ matrix.name }})
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --user 1001
     timeout-minutes: 10
     permissions:
       contents: read
+    # This job tests framework versions, not browsers.
+    env:
+      REVEAL_BROWSERS: chromium
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
@@ -84,11 +93,15 @@ jobs:
           - name: Astro 6
             package: "@awesome-reveal/astro"
             deps: astro@6
-            projects: --project astro:unit --project astro:ssr
+            projects: --project astro:unit --project astro:ssr --project astro:browser
           - name: React 18
             package: "@awesome-reveal/react"
             deps: react@18 react-dom@18 @types/react@18 @types/react-dom@18
-            projects: --project react:unit --project react:ssr
+            projects: --project react:unit --project react:ssr --project react:browser
+          - name: Vue 3.5.0
+            package: "@awesome-reveal/vue"
+            deps: vue@3.5.0
+            projects: --project vue:unit --project vue:ssr --project vue:browser
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -122,6 +135,15 @@ jobs:
         run: |
           read -r -a projects <<< "$PROJECTS"
           pnpm vitest run "${projects[@]}"
+
+      - name: Upload failure screenshots and traces
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: browser-test-results-${{ matrix.name }}
+          path: .vitest/
+          include-hidden-files: true
+          if-no-files-found: ignore
 
   package:
     name: Package

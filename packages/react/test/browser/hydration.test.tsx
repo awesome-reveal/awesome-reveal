@@ -1,13 +1,12 @@
-import { act } from "@testing-library/react";
 import { type ReactElement, version } from "react";
 import { hydrateRoot, type Root } from "react-dom/client";
 
-import { animations } from "@awesome-reveal/test-utils/animate";
+import { createStage, intersect } from "@awesome-reveal/test-utils/layout";
+import { expectSame, finishEntrances, trackAnimations } from "@awesome-reveal/test-utils/spies";
 
-import { intersect } from "./intersect";
-import { Cascade, Reveal } from "../src/Reveal";
-import { useCascade } from "../src/useCascade";
-import { type RevealOptions, useReveal } from "../src/useReveal";
+import { Cascade, Reveal } from "../../src/Reveal";
+import { useCascade } from "../../src/useCascade";
+import { type RevealOptions, useReveal } from "../../src/useReveal";
 
 function HookBox(options: RevealOptions) {
   const { getProps } = useReveal<HTMLDivElement>(options);
@@ -29,23 +28,27 @@ function CascadeHookBox() {
 }
 
 let root: Root | undefined;
+let animate: ReturnType<typeof trackAnimations>;
 
-// The server markup is a literal, because React 18 warns when jsdom, which has a document, renders it.
-// ssr.test.tsx checks the real server output.
+beforeEach(() => {
+  animate = trackAnimations();
+});
+
+// The server markup is a literal. `useReveal` uses `useLayoutEffect` where `document` exists, and then
+// React 18 warns in `renderToString`. ssr.test.tsx checks the real server output.
 async function hydrate(html: string, tree: ReactElement) {
-  const container = document.createElement("div");
+  const container = createStage();
   container.innerHTML = html;
-  document.body.append(container);
-  await act(async () => {
-    root = hydrateRoot(container, tree);
-  });
-  return container.firstElementChild as HTMLElement;
+  root = hydrateRoot(container, tree);
+  const element = container.firstElementChild as HTMLElement;
+  await expect.element(element).toHaveAttribute("data-awesome-reveal-attached");
+  return element;
 }
 
 // The setup fails the test on a hydration mismatch warning.
 describe(`hydration (React ${version})`, () => {
-  afterEach(async () => {
-    await act(async () => root?.unmount());
+  afterEach(() => {
+    root?.unmount();
     root = undefined;
     document.body.innerHTML = "";
   });
@@ -54,11 +57,12 @@ describe(`hydration (React ${version})`, () => {
     const element = await hydrate('<div data-awesome-reveal="hidden">x</div>', <Reveal>x</Reveal>);
 
     expect(element).toHaveStyle({ opacity: "0" });
-    expect(animations).toHaveLength(0);
-    intersect(element, true);
+    expect(animate.calls()).toHaveLength(0);
+    await intersect(element);
+    finishEntrances(animate);
     expect(element).not.toHaveAttribute("data-awesome-reveal");
     expect(element).toHaveStyle({ opacity: "1" });
-    expect(animations).toHaveLength(1);
+    expect(animate.calls()).toHaveLength(1);
   });
 
   it("hydrates useReveal hidden, then reveals it", async () => {
@@ -68,11 +72,12 @@ describe(`hydration (React ${version})`, () => {
     );
 
     expect(element).toHaveStyle({ opacity: "0" });
-    expect(animations).toHaveLength(0);
-    intersect(element, true);
+    expect(animate.calls()).toHaveLength(0);
+    await intersect(element);
+    finishEntrances(animate);
     expect(element).not.toHaveAttribute("data-awesome-reveal");
     expect(element).toHaveStyle({ opacity: "1" });
-    expect(animations).toHaveLength(1);
+    expect(animate.calls()).toHaveLength(1);
   });
 
   it("hydrates Reveal with when hidden, then plays the entrance once", async () => {
@@ -82,7 +87,10 @@ describe(`hydration (React ${version})`, () => {
     );
 
     expect(element).not.toHaveAttribute("data-awesome-reveal");
-    expect(animations.map((animation) => animation.element)).toEqual([element]);
+    expectSame(
+      animate.calls().map((call) => call.element),
+      [element],
+    );
   });
 
   it("hydrates useReveal with when hidden, then plays the entrance once", async () => {
@@ -92,7 +100,10 @@ describe(`hydration (React ${version})`, () => {
     );
 
     expect(element).not.toHaveAttribute("data-awesome-reveal");
-    expect(animations.map((animation) => animation.element)).toEqual([element]);
+    expectSame(
+      animate.calls().map((call) => call.element),
+      [element],
+    );
   });
 
   const CascadeBox = () => (
@@ -114,9 +125,13 @@ describe(`hydration (React ${version})`, () => {
 
     expect(element).toHaveStyle({ opacity: "1" });
     expect(children[0]).toHaveStyle({ opacity: "0" });
-    intersect(element, true);
+    await intersect(element);
+    finishEntrances(animate);
     expect(element).not.toHaveAttribute("data-awesome-reveal");
     expect(children[0]).toHaveStyle({ opacity: "1" });
-    expect(animations.map((animation) => animation.element)).toEqual(children);
+    expectSame(
+      animate.calls().map((call) => call.element),
+      children,
+    );
   });
 });

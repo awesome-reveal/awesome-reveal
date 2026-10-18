@@ -1,5 +1,5 @@
-import { act, render } from "@testing-library/react";
 import type { CSSProperties, ReactElement } from "react";
+import { render } from "vitest-browser-react";
 
 import {
   type ContractOptions,
@@ -8,9 +8,9 @@ import {
   type Harness,
 } from "@awesome-reveal/test-utils/contract";
 
-import { Cascade, Reveal } from "../src/Reveal";
-import { useCascade } from "../src/useCascade";
-import { type RevealOptions, useReveal } from "../src/useReveal";
+import { Cascade, Reveal } from "../../src/Reveal";
+import { useCascade } from "../../src/useCascade";
+import { type RevealOptions, useReveal } from "../../src/useReveal";
 
 const children = [1, 2, 3].map((n) => <span key={n}>{n}</span>);
 
@@ -24,20 +24,18 @@ function harness(tree: Tree): Harness {
   return {
     replacesNode: true,
     async mount(options, init) {
-      const style = init?.style as CSSProperties | undefined;
+      const style = init.style as CSSProperties | undefined;
       let current = options;
       let swap = false;
-      const result = render(tree(current, style, swap));
-      const update = async () => result.rerender(tree(current, style, swap));
+      const screen = await render(tree(current, style, swap), { container: init.container });
+      const update = () => screen.rerender(tree(current, style, swap));
       return {
-        element: () => result.container.querySelector<HTMLElement>("[data-contract]")!,
+        element: () => screen.container.querySelector<HTMLElement>("[data-contract]")!,
         rerender: async (next) => {
           current = next;
           await update();
         },
-        unmount: async () => result.unmount(),
-        flush: async () => act(async () => {}),
-        run: async (fn) => act(fn),
+        unmount: () => screen.unmount(),
         replaceNode: async (next) => {
           if (next) current = next;
           swap = true;

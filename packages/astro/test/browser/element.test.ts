@@ -1,12 +1,23 @@
-import { animations } from "@awesome-reveal/test-utils/animate";
-import { intersect, observerOf } from "@awesome-reveal/test-utils/intersection-observer";
 import { collectWindowErrors } from "@awesome-reveal/test-utils/reports";
+import { createStage, intersect, scrollToTop } from "@awesome-reveal/test-utils/layout";
+import { expectSame, trackAnimations, trackObservers } from "@awesome-reveal/test-utils/spies";
 
-import type { RevealElement } from "../src/element";
+import type { RevealElement } from "../../src/element";
+
+let animate: ReturnType<typeof trackAnimations>;
+let observers: ReturnType<typeof trackObservers>;
+let stage: HTMLElement;
+
+// The stage is below the fold, so the element reveals only when the test scrolls to it.
+beforeEach(() => {
+  animate = trackAnimations();
+  observers = trackObservers();
+  stage = createStage();
+});
 
 function render(options?: object) {
-  document.body.innerHTML = `<awesome-reveal><p data-awesome-reveal="hidden">hello</p></awesome-reveal>`;
-  const host = document.querySelector<RevealElement>("awesome-reveal")!;
+  stage.innerHTML = `<awesome-reveal><p data-awesome-reveal="hidden">hello</p></awesome-reveal>`;
+  const host = stage.querySelector<RevealElement>("awesome-reveal")!;
   // Sets the attribute after the connection, as the browser parser can.
   if (options) host.setAttribute("options", JSON.stringify(options));
   return { host, element: host.firstElementChild as HTMLElement };
@@ -17,38 +28,50 @@ function connect(options: object, when?: string) {
   host.setAttribute("options", JSON.stringify(options));
   if (when != null) host.setAttribute("when", when);
   host.innerHTML = `<p data-awesome-reveal="hidden">hello</p>`;
-  document.body.append(host);
+  stage.append(host);
   return { host, element: host.firstElementChild as HTMLElement };
 }
 
+// The TypeScript DOM lib does not declare moveBefore().
+type MovableParent = ParentNode & { moveBefore(node: Node, child: Node | null): void };
+
+// WebKit has no moveBefore(), so the test calls the callback that a move calls in its place.
+function move(host: RevealElement) {
+  if ("moveBefore" in Element.prototype) (host.parentNode as MovableParent).moveBefore(host, null);
+  else host.connectedMoveCallback();
+}
+
 describe("<awesome-reveal>", () => {
-  it("hides its first element child, and reveals it with the options of the attribute", () => {
+  it("hides its first element child, and reveals it with the options of the attribute", async () => {
     const { element } = connect({ duration: 100, threshold: 0.5 });
 
     expect(element).toHaveStyle({ opacity: "0" });
-    expect(observerOf(element)).toMatchObject({ thresholds: [0, 0.5] });
+    expect(observers.observerOf(element)?.thresholds).toEqual([0, 0.5]);
 
-    intersect(element, true);
+    await intersect(element);
 
     expect(element).not.toHaveAttribute("data-awesome-reveal");
-    expect(animations).toHaveLength(1);
-    expect(animations[0]).toMatchObject({ element, options: { duration: 100 } });
+    expectSame(
+      animate.calls().map((call) => call.element),
+      [element],
+    );
+    expect(animate.calls()[0]?.options).toMatchObject({ duration: 100 });
   });
 
-  it("uses the default options without an attribute", () => {
+  it("uses the default options without an attribute", async () => {
     const { element } = render();
 
-    intersect(element, true);
+    await intersect(element);
 
-    expect(animations[0]?.options).toMatchObject({ duration: 600, delay: 0 });
+    expect(animate.calls()[0]?.options).toMatchObject({ duration: 600, delay: 0 });
   });
 
   it("reveals at once with `when`, and does not observe the viewport", () => {
     const { element } = connect({}, "true");
 
     expect(element).not.toHaveAttribute("data-awesome-reveal");
-    expect(observerOf(element)).toBeUndefined();
-    expect(animations).toHaveLength(1);
+    expect(observers.observerOf(element)).toBeUndefined();
+    expect(animate.calls()).toHaveLength(1);
   });
 
   it("applies a change of the options attribute", () => {
@@ -57,7 +80,9 @@ describe("<awesome-reveal>", () => {
     host.setAttribute("options", JSON.stringify({ duration: 200 }));
     host.when = true;
 
-    expect(animations[0]).toMatchObject({ element, options: { duration: 200 } });
+    expect(animate.calls()).toHaveLength(1);
+    expect(animate.calls()[0]?.element).toBe(element);
+    expect(animate.calls()[0]?.options).toMatchObject({ duration: 200 });
   });
 
   it("reflects `when` in its attribute, and tells whether it is revealed", () => {
@@ -74,79 +99,81 @@ describe("<awesome-reveal>", () => {
     host.when = null;
     expect(host.hasAttribute("when")).toBe(false);
     expect(host.when).toBeNull();
-    expect(observerOf(element)).toBeDefined();
+    expect(observers.observerOf(element)).toBeDefined();
   });
 
-  it("dispatches a reveal event that bubbles from the element at each reveal", () => {
+  it("dispatches a reveal event that bubbles from the element at each reveal", async () => {
     const { host, element } = connect({});
     const targets: EventTarget[] = [];
     host.addEventListener("reveal", (event) => targets.push(event.target!));
 
-    intersect(element, true);
+    await intersect(element);
     host.when = false;
     host.when = true;
 
-    expect(targets).toEqual([element, element]);
+    expectSame(targets, [element, element]);
   });
 
   it("stops the observation when it leaves the document", async () => {
     const { host, element } = connect({});
+    expect(observers.observerOf(element)).toBeDefined();
 
     host.remove();
     await Promise.resolve();
 
-    expect(observerOf(element)).toBeUndefined();
+    expect(observers.observerOf(element)).toBeUndefined();
   });
 
   it("keeps its state when it leaves and enters the document in one task", async () => {
     const { host, element } = connect({});
-    intersect(element, true);
+    await intersect(element);
 
-    document.body.append(document.createElement("div"), host);
+    stage.append(document.createElement("div"), host);
     await Promise.resolve();
 
     expect(element).not.toHaveAttribute("data-awesome-reveal");
-    expect(observerOf(element)).toBeUndefined();
-    expect(animations).toHaveLength(1);
+    expect(observers.observerOf(element)).toBeUndefined();
+    expect(animate.calls()).toHaveLength(1);
   });
 
   it.each(["re-append", "moveBefore"])(
     "keeps the observer of a hidden element after a %s",
-    async (move) => {
+    async (action) => {
       const { host, element } = connect({});
-      const observer = observerOf(element);
+      const observer = observers.observerOf(element);
+      expect(observer).toBeDefined();
 
-      // jsdom has no moveBefore(), which calls this callback instead of the disconnection.
-      if (move === "moveBefore") host.connectedMoveCallback();
-      else document.body.append(document.createElement("div"), host);
+      if (action === "moveBefore") move(host);
+      else stage.append(document.createElement("div"), host);
       await Promise.resolve();
 
       expect(element).toHaveAttribute("data-awesome-reveal", "hidden");
-      expect(observerOf(element)).toBe(observer);
+      expect(observers.observerOf(element)).toBe(observer);
     },
   );
 
-  it("keeps its state when moveBefore() moves it", () => {
+  it("keeps its state when moveBefore() moves it", async () => {
     const { host, element } = connect({});
-    intersect(element, true);
+    await intersect(element);
 
-    // jsdom has no moveBefore(), which calls this callback instead of the disconnection.
-    host.connectedMoveCallback();
+    move(host);
 
     expect(element).not.toHaveAttribute("data-awesome-reveal");
-    expect(observerOf(element)).toBeUndefined();
+    expect(observers.observerOf(element)).toBeUndefined();
   });
 
   it("hides and observes the element again when it enters the document later", async () => {
     const { host, element } = connect({});
-    intersect(element, true);
+    await intersect(element);
     host.remove();
     await Promise.resolve();
+    // The element must not intersect when it enters the document.
+    scrollToTop();
 
-    document.body.append(host);
+    stage.append(host);
 
     expect(element).toHaveStyle({ opacity: "0" });
-    expect(observerOf(element)).toBeDefined();
+    expect(observers.observerOf(element)).toBeDefined();
   });
 
   describe("on a prerendered page", () => {
@@ -167,11 +194,11 @@ describe("<awesome-reveal>", () => {
 
     it("waits for the activation", () => {
       const { element } = connect({});
-      expect(observerOf(element)).toBeUndefined();
+      expect(observers.observerOf(element)).toBeUndefined();
 
       activate();
 
-      expect(observerOf(element)).toBeDefined();
+      expect(observers.observerOf(element)).toBeDefined();
     });
 
     it("reads the options at the activation", () => {
@@ -180,7 +207,7 @@ describe("<awesome-reveal>", () => {
 
       activate();
 
-      expect(observerOf(element)).toMatchObject({ thresholds: [0, 0.5] });
+      expect(observers.observerOf(element)?.thresholds).toEqual([0, 0.5]);
     });
 
     it("keeps a focused element hidden at the connection with when: false", () => {
@@ -188,7 +215,7 @@ describe("<awesome-reveal>", () => {
       const onReveal = vi.fn();
       host.addEventListener("reveal", onReveal);
       element.tabIndex = -1;
-      element.focus();
+      element.focus({ preventScroll: true });
 
       activate();
 
@@ -202,7 +229,7 @@ describe("<awesome-reveal>", () => {
 
       activate();
 
-      expect(observerOf(element)).toBeUndefined();
+      expect(observers.observerOf(element)).toBeUndefined();
     });
   });
 
@@ -210,75 +237,81 @@ describe("<awesome-reveal>", () => {
     const host = document.createElement("awesome-reveal") as RevealElement;
     host.setAttribute("options", value);
     host.innerHTML = `<p data-awesome-reveal="hidden">hello</p>`;
-    document.body.append(host);
+    stage.append(host);
     return host.firstElementChild as HTMLElement;
   }
 
   it.each(["null", '"slide"', "5"])(
     "reveals with the default options when the attribute is %s",
-    (value) => {
+    async (value) => {
       const element = connectRaw(value);
 
-      intersect(element, true);
+      await intersect(element);
 
       expect(element).not.toHaveAttribute("data-awesome-reveal");
-      expect(animations).toHaveLength(1);
+      expect(animate.calls()).toHaveLength(1);
     },
   );
 
-  it("reports an invalid options attribute and reveals with the defaults", () => {
+  it("reports an invalid options attribute and reveals with the defaults", async () => {
     const stop = collectWindowErrors();
     const element = connectRaw("{");
     const errors = stop();
 
-    intersect(element, true);
+    await intersect(element);
 
     expect(errors).toEqual([expect.any(SyntaxError)]);
     expect(element).not.toHaveAttribute("data-awesome-reveal");
-    expect(animations[0]?.options).toMatchObject({ duration: 600 });
+    expect(animate.calls()[0]?.options).toMatchObject({ duration: 600 });
   });
 
-  it("lets the viewport reveal with an invalid options attribute, also with when: false", () => {
+  it("lets the viewport reveal with an invalid options attribute, also with when: false", async () => {
     const stop = collectWindowErrors();
     const host = document.createElement("awesome-reveal") as RevealElement;
     host.setAttribute("options", "{");
     host.setAttribute("when", "false");
     host.innerHTML = `<p data-awesome-reveal="hidden">hello</p>`;
-    document.body.append(host);
-    stop();
+    stage.append(host);
+    const errors = stop();
     const element = host.firstElementChild as HTMLElement;
 
-    intersect(element, true);
+    await intersect(element);
 
+    expect(errors).toEqual([expect.any(SyntaxError)]);
     expect(element).not.toHaveAttribute("data-awesome-reveal");
   });
 
-  it("uses the default options when the attribute changes to null", () => {
+  it("uses the default options when the attribute changes to null", async () => {
     const { host, element } = connect({ duration: 100 });
 
     host.setAttribute("options", "null");
-    intersect(element, true);
+    await intersect(element);
 
-    expect(animations[0]).toMatchObject({ element, options: { duration: 600 } });
+    expect(animate.calls()).toHaveLength(1);
+    expect(animate.calls()[0]?.element).toBe(element);
+    expect(animate.calls()[0]?.options).toMatchObject({ duration: 600 });
   });
 
-  it("keeps the previous options when the attribute changes to invalid JSON", () => {
+  it("keeps the previous options when the attribute changes to invalid JSON", async () => {
     const { host, element } = connect({ duration: 100 });
     const stop = collectWindowErrors();
     host.setAttribute("options", "{");
-    stop();
-    intersect(element, true);
+    const errors = stop();
+    await intersect(element);
 
-    expect(animations[0]).toMatchObject({ element, options: { duration: 100 } });
+    expect(errors).toEqual([expect.any(SyntaxError)]);
+    expect(animate.calls()).toHaveLength(1);
+    expect(animate.calls()[0]?.element).toBe(element);
+    expect(animate.calls()[0]?.options).toMatchObject({ duration: 100 });
   });
 
   it("reports a host whose element child the parser moved out", () => {
     const stop = collectWindowErrors();
-    document.body.innerHTML =
+    stage.innerHTML =
       '<p>Intro <awesome-reveal><div data-awesome-reveal="hidden">hello</div></awesome-reveal></p>';
     const errors = stop();
 
-    expect(document.querySelector("awesome-reveal")!.childElementCount).toBe(0);
+    expect(stage.querySelector("awesome-reveal")!.childElementCount).toBe(0);
     expect(errors).toEqual([
       expect.objectContaining({
         message: expect.stringContaining("moved the element out of <awesome-reveal>"),

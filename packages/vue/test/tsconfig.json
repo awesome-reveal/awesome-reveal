@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
-    "types": ["node", "vitest/globals"]
+    "types": ["node", "vitest/globals", "vitest/browser", "vite/client"]
   },
   "include": ["../src", ".", "**/*.vue", "../vite.config.ts"],
   "exclude": ["package"]

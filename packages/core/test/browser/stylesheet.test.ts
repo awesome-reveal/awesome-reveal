@@ -8,7 +8,7 @@ import {
   type RevealStore,
 } from "../../src/adapter";
 import css from "../../../react/src/reveal.css?raw";
-import { settle } from "./helpers";
+import { settle } from "@awesome-reveal/test-utils/layout";
 
 const opacity = (element: Element) => getComputedStyle(element).opacity;
 const hold = (element: Element) =>
@@ -205,6 +205,8 @@ describe("reveal.css", () => {
 
   // WebKit does not Tab to buttons and links by default, so the tests use inputs.
   describe("keyboard", () => {
+    // WebKit scrolls to a focused element after a rendering update, so a Tab can scroll the next test.
+    afterEach(settle);
     beforeEach(() => {
       document.body.innerHTML = `<input id="before"><div style="height: 150vh"></div><div id="target" data-awesome-reveal="hidden"><input id="field"></div><div style="height: 150vh"></div>`;
       scrollTo(0, 0);

@@ -85,12 +85,11 @@
     "@awesome-reveal/core": "workspace:^"
   },
   "devDependencies": {
-    "@testing-library/dom": "^10.4.2",
-    "@testing-library/react": "^16.3.3",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "vitest-browser-react": "^2.3.0"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"

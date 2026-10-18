@@ -9,9 +9,9 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "prepare": "husky",
-    "test": "vitest run --project \"*:unit\" --project \"*:ssr\" --project \"*:browser\"",
+    "test": "vitest run --project \"*:unit\" --project \"*:ssr\" --project \"*:browser\" --project \"*:e2e\"",
     "test:package": "pnpm build && vitest run --project \"*:package\" && pnpm --filter \"./packages/*\" --parallel check:package",
-    "test:watch": "vitest --project \"*:unit\""
+    "test:watch": "vitest --project \"*:unit\" --project \"*:browser\""
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
@@ -22,7 +22,6 @@
     "@vitest/browser-playwright": "^5.0.3",
     "@vitest/coverage-istanbul": "^5.0.3",
     "husky": "^9.1.7",
-    "jsdom": "^30.1.2",
     "lint-staged": "^17.6.0",
     "oxfmt": "^0.72.0",
     "oxlint": "^1.87.0",

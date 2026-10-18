@@ -5,9 +5,7 @@ import {
   type Harness,
 } from "@awesome-reveal/test-utils/contract";
 
-import { RevealElement } from "../src/element";
-
-if (!customElements.get("awesome-reveal")) customElements.define("awesome-reveal", RevealElement);
+import type { RevealElement } from "../../src/element";
 
 // Builds the markup of Host.astro by hand. ssr.test.ts checks the real server output.
 const harness = (cascade: boolean): Harness => ({
@@ -24,10 +22,10 @@ const harness = (cascade: boolean): Harness => ({
     const element = document.createElement("div");
     element.setAttribute("data-contract", "");
     element.setAttribute("data-awesome-reveal", cascade ? "cascade" : "hidden");
-    Object.assign(element.style, init?.style);
+    Object.assign(element.style, init.style);
     element.innerHTML = "<span>1</span><span>2</span><span>3</span>";
     host.append(element);
-    document.body.append(host);
+    init.container.append(host);
     return {
       element: () => element,
       rerender: async (next) => {
@@ -38,8 +36,6 @@ const harness = (cascade: boolean): Harness => ({
         host.remove();
         await Promise.resolve();
       },
-      flush: () => Promise.resolve(),
-      run: async (fn) => fn(),
     };
   },
 });

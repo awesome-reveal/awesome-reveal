@@ -1,3 +1,5 @@
+import { forgetCollectedWindowErrors, isCollectedWindowError } from "../reports";
+
 // Frameworks report invalid props, missing keys, act() problems and server warnings only through the console.
 beforeEach(() => {
   vi.spyOn(console, "error");
@@ -5,7 +7,12 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  expect(console.error).not.toHaveBeenCalled();
+  // The browser test runner relays the window errors that collectWindowErrors() collected.
+  const unexpected = vi
+    .mocked(console.error)
+    .mock.calls.filter((args) => !isCollectedWindowError(args));
+  forgetCollectedWindowErrors();
+  expect(unexpected).toEqual([]);
   expect(console.warn).not.toHaveBeenCalled();
   vi.restoreAllMocks();
 });
