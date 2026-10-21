@@ -21,16 +21,15 @@ function start(target: RevealTarget, options: RevealOptions, interval?: number):
   for (const element of new Set(resolveTargets(target))) {
     const animations = entrances(element, options, interval);
     const group = motions(animations);
-    const disconnect = observe(element, options, () =>
-      focused(element) ? group.dispose() : group.play(),
-    );
+    let disconnect: (() => void) | undefined;
     const release = (keep?: boolean) => {
       if (!releases.delete(release)) return;
-      disconnect();
+      disconnect?.();
       group.dispose(keep);
       if (!releases.size) preference?.removeEventListener?.("change", onPreference);
     };
     releases.add(release);
+    disconnect = observe(element, options, () => (focused(element) ? release() : group.play()));
     Promise.allSettled(animations.map((animation) => animation?.finished)).then(() =>
       release(true),
     );
