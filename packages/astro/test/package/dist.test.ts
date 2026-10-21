@@ -38,7 +38,7 @@ describe("dist", () => {
   );
 
   it("contains one JavaScript file per source module, the components, and declarations only for src", () => {
-    expect(jsFiles).toEqual(["element.js", "index.js"]);
+    expect(jsFiles).toEqual(["control.js", "element.js", "index.js"]);
     expect(distFiles).toEqual(expect.arrayContaining(components));
     expect(distFiles).toContain("index.d.ts");
     expect(distFiles.filter((file) => /(^|\/)test/.test(file))).toEqual([]);
@@ -95,11 +95,17 @@ describe("a static build of a page with the published component", () => {
     );
   });
 
-  it("bundles a small client script", () => {
+  it("bundles a small client script, and getReveal only in the script that calls it", () => {
     const code = scripts(site);
+    const host = code.filter((script) =>
+      /customElements\.define\(["`]awesome-reveal["`]/.test(script),
+    );
+    const control = code.filter((script) => script.includes("getReveal() needs the element"));
 
-    expect(code).toMatch(/customElements\.define\(["`]awesome-reveal["`]/);
-    expect(code.length).toBeLessThan(5150);
+    expect(host).toHaveLength(1);
+    expect(control).toHaveLength(1);
+    expect(host[0]!.length).toBeLessThan(5150);
+    expect(control[0]!.length).toBeLessThan(600);
   });
 });
 

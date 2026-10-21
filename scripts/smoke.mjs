@@ -260,7 +260,10 @@ export function Card() {
     scaffold: false,
     check: ["astro", "check"],
     build: ["astro", "build"],
-    verify: browse({ paths: ["/"] }),
+    verify: browse({
+      paths: ["/"],
+      more: (page) => page.waitForSelector("#manual:not([data-awesome-reveal])"),
+    }),
     files: {
       "astro.config.mjs": `import { defineConfig } from "astro/config";\nexport default defineConfig({});\n`,
       "tsconfig.json": `{ "extends": "astro/tsconfigs/strict", "include": [".astro/types.d.ts", "**/*"], "exclude": ["dist"] }\n`,
@@ -274,6 +277,13 @@ import { Reveal } from "@awesome-reveal/astro";
 <Reveal from="top">Slide</Reveal>
 <div style="height: 200vh"></div>
 <Reveal id="below" from="bottom">Below</Reveal>
+<Reveal id="manual" when={false}>Manual</Reveal>
+
+<script>
+  import { getReveal } from "@awesome-reveal/astro";
+
+  getReveal(document.querySelector("#manual")!).when = true;
+</script>
 `,
     },
   },

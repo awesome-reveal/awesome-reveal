@@ -1,6 +1,14 @@
 import type { RevealOptions } from "@awesome-reveal/core/adapter";
 
-import type { Cascade, CascadeProps, Reveal, RevealProps, RevealTag } from "../../src";
+import {
+  type Cascade,
+  type CascadeProps,
+  getReveal,
+  type Reveal,
+  type RevealControl,
+  type RevealProps,
+  type RevealTag,
+} from "../../src";
 
 test("Reveal and Cascade reject tags that the host cannot wrap", () => {
   expectTypeOf<"table" | "select" | "option" | "a" | "div" | "svg">().toExtend<RevealTag>();
@@ -47,10 +55,15 @@ test("Reveal takes the entrance options, and no callback, which cannot cross to 
   expectTypeOf<RevealProps>().not.toHaveProperty("onReveal");
 });
 
-test("the custom element has typed when and revealed properties", () => {
-  const host = document.createElement("awesome-reveal");
-  expectTypeOf(host.when).toEqualTypeOf<boolean | null>();
-  expectTypeOf(host.revealed).toEqualTypeOf<boolean>();
+test("getReveal takes any rendered element, also svg, and gives typed when and revealed properties", () => {
+  expectTypeOf(getReveal).parameter(0).toEqualTypeOf<Element>();
+  expectTypeOf(getReveal).returns.toEqualTypeOf<RevealControl>();
+  expectTypeOf<RevealControl["when"]>().toEqualTypeOf<boolean | null>();
+  expectTypeOf<RevealControl>().toHaveProperty("revealed").toEqualTypeOf<boolean>();
+});
+
+test("the host element is not in the DOM types", () => {
+  expectTypeOf(document.createElement("awesome-reveal")).toEqualTypeOf<HTMLElement>();
 });
 
 test("Reveal and Cascade take delay", () => {

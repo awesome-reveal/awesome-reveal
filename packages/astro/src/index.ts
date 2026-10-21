@@ -3,17 +3,11 @@ import type { CascadeOptions, RevealOptions } from "@awesome-reveal/core/adapter
 import type { JSX } from "astro/jsx-runtime";
 import type { Polymorphic } from "astro/types";
 
-import type { RevealElement } from "./element.js";
 import CascadeComponent from "./Cascade.astro";
 import RevealComponent from "./Reveal.astro";
 
-export type { CascadeOptions, RevealElement, RevealOptions };
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "awesome-reveal": RevealElement;
-  }
-}
+export type { CascadeOptions, RevealOptions };
+export { getReveal, type RevealControl } from "./control.js";
 
 type WithoutCallback<T> = T extends unknown ? Omit<T, "onReveal"> : never;
 

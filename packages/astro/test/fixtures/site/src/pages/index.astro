@@ -13,5 +13,10 @@ import { Reveal } from "@awesome-reveal/astro";
     <Reveal as="section" class="box">
       <p>box</p>
     </Reveal>
+    <script>
+      import { getReveal } from "@awesome-reveal/astro";
+
+      getReveal(document.querySelector(".box")!).when = true;
+    </script>
   </body>
 </html>

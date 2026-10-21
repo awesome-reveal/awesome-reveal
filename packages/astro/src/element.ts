@@ -10,10 +10,16 @@ import {
 const onReveal = (element: Element) =>
   element.dispatchEvent(new Event("reveal", { bubbles: true }));
 
+// Keep in sync with getReveal(). A shared module would add a chunk to each page with a reveal.
+function readWhen(host: Element): boolean | null {
+  const when = host.getAttribute("when");
+  return when == null ? null : when !== "false";
+}
+
 function readOptions(host: RevealElement): CascadeOptions {
   return {
     ...JSON.parse(host.getAttribute("options") || "{}"),
-    when: host.when ?? undefined,
+    when: readWhen(host),
     onReveal,
   };
 }
@@ -30,17 +36,6 @@ export class RevealElement extends HTMLElement {
   /** Tells if the element is revealed. */
   get revealed(): boolean {
     return this.controller?.revealed ?? false;
-  }
-
-  /** Controls the reveal manually, as the `when` prop does. `null` gives the control to the viewport. */
-  get when(): boolean | null {
-    const when = this.getAttribute("when");
-    return when == null ? null : when !== "false";
-  }
-
-  set when(value: boolean | null) {
-    if (value == null) this.removeAttribute("when");
-    else this.setAttribute("when", String(value));
   }
 
   connectedCallback() {
