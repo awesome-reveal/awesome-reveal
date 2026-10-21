@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.0.0-next.12](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/astro@1.0.0-next.11...@awesome-reveal/astro@1.0.0-next.12) (2026-10-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* **astro:** add getReveal and make the host element internal ([#332](https://github.com/awesome-reveal/awesome-reveal/issues/332))
+
+### Features
+
+* **astro:** add getReveal and make the host element internal ([#332](https://github.com/awesome-reveal/awesome-reveal/issues/332)) ([e582aad](https://github.com/awesome-reveal/awesome-reveal/commit/e582aad6e50c0640341c886d660b0b40d57f0fe0))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @awesome-reveal/core bumped to 1.0.0-next.12
+
 ## [1.0.0-next.11](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/astro@1.0.0-next.10...@awesome-reveal/astro@1.0.0-next.11) (2026-10-18)
 
 

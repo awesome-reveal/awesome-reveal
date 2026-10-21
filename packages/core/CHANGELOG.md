@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.0-next.12](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/core@1.0.0-next.11...@awesome-reveal/core@1.0.0-next.12) (2026-10-21)
+
+
+### Bug Fixes
+
+* **core:** release a reveal whose element has focus at the start ([#330](https://github.com/awesome-reveal/awesome-reveal/issues/330)) ([bcd0c77](https://github.com/awesome-reveal/awesome-reveal/commit/bcd0c77d8631344d3ff16cd4b5eced9eb4d26ae3))
+* **core:** release settled adapter entrances ([#333](https://github.com/awesome-reveal/awesome-reveal/issues/333)) ([7f46941](https://github.com/awesome-reveal/awesome-reveal/commit/7f469411d4de503de9221ff6fb6907ed938bddde))
+
 ## [1.0.0-next.11](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/core@1.0.0-next.10...@awesome-reveal/core@1.0.0-next.11) (2026-10-18)
 
 

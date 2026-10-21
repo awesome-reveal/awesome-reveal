@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.0.0-next.12](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/vue@1.0.0-next.11...@awesome-reveal/vue@1.0.0-next.12) (2026-10-21)
+
+
+### Miscellaneous Chores
+
+* **@awesome-reveal/vue:** Synchronize awesome-reveal versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @awesome-reveal/core bumped to 1.0.0-next.12
+
 ## [1.0.0-next.11](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/vue@1.0.0-next.10...@awesome-reveal/vue@1.0.0-next.11) (2026-10-18)
 
 
