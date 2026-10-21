@@ -2,6 +2,7 @@
 export interface RevealControl {
   /** Controls the reveal manually, as the `when` prop does. `null` gives the control to the viewport. */
   when: boolean | null;
+  /** Tells if the element is revealed. It stays `false` until the client script attaches the element. */
   readonly revealed: boolean;
 }
 

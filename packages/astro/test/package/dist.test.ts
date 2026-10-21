@@ -95,12 +95,17 @@ describe("a static build of a page with the published component", () => {
     );
   });
 
-  it("bundles a small client script", () => {
+  it("bundles a small client script, and getReveal only in the script that calls it", () => {
     const code = scripts(site);
+    const host = code.filter((script) =>
+      /customElements\.define\(["`]awesome-reveal["`]/.test(script),
+    );
+    const control = code.filter((script) => script.includes("getReveal() needs the element"));
 
-    expect(code).toMatch(/customElements\.define\(["`]awesome-reveal["`]/);
-    expect(code).toContain("getReveal() needs the element");
-    expect(code.length).toBeLessThan(5580);
+    expect(host).toHaveLength(1);
+    expect(control).toHaveLength(1);
+    expect(host[0]!.length).toBeLessThan(5150);
+    expect(control[0]!.length).toBeLessThan(600);
   });
 });
 

@@ -52,10 +52,10 @@ export async function buildSite(
   }
 }
 
-export function scripts({ html, assets }: Site): string {
+export function scripts({ html, assets }: Site): string[] {
   const inline = [...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/g)].map(
     ([, code]) => code!,
   );
   const files = Object.entries(assets).filter(([name]) => name.endsWith(".js"));
-  return [...inline, ...files.map(([, code]) => code)].join("\n");
+  return [...inline, ...files.map(([, code]) => code)];
 }
