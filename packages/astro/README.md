@@ -101,7 +101,7 @@ For a long list, or a grid that is taller than the viewport, wrap each item in `
 
 ### Control the reveal
 
-`when` controls the entrance. `true` plays it, and `false` resets it with no exit animation. Without `when`, the viewport controls it. After the page loads, set the `when` property of the `awesome-reveal` host element.
+`when` controls the entrance. `true` plays it, and `false` resets it with no exit animation. Without `when`, the viewport controls it. In a client script, pass the rendered tag to `getReveal`, and set the `when` property of the result.
 
 `when` does not show or hide content. With `when={false}`, the element is transparent, but screen readers read it and the keyboard can focus it. `inert` does not hide content: it only blocks focus, clicks and assistive technology. To hide content, also set `hidden` on the rendered tag:
 
@@ -114,26 +114,26 @@ import { Reveal } from "@awesome-reveal/astro";
 <Reveal id="details" when={false} hidden from={{ opacity: 0 }}>Details</Reveal>
 
 <script>
-  import type {} from "@awesome-reveal/astro";
+  import { getReveal } from "@awesome-reveal/astro";
 
   const button = document.querySelector("#toggle")!;
   const details = document.querySelector("#details")!;
-  const host = details.closest("awesome-reveal")!;
+  const reveal = getReveal(details);
 
   button.addEventListener("click", () => {
-    const open = !host.when;
-    host.when = open;
+    const open = !reveal.when;
+    reveal.when = open;
     details.toggleAttribute("hidden", !open);
     button.setAttribute("aria-expanded", String(open));
   });
 </script>
 ```
 
-The type import adds the `awesome-reveal` element to the DOM types. To play the entrance again, set `when` to `false`, then to `true`.
+To play the entrance again, set `when` to `false`, then to `true`. With the `<ClientRouter />`, get the elements again in an `astro:page-load` listener, because each navigation renders new elements.
 
 ### Run code at the reveal
 
-The rendered tag dispatches a `reveal` event that bubbles, when the reveal starts. The host has a `revealed` property. To wait for the end of the entrance, wait for the `finished` promises of the animations of the event target:
+The rendered tag dispatches a `reveal` event that bubbles, when the reveal starts. The result of `getReveal` has a `revealed` property. To wait for the end of the entrance, wait for the `finished` promises of the animations of the event target:
 
 ```ts
 document.addEventListener("reveal", (event) => {
@@ -163,15 +163,16 @@ The promise rejects when the entrance stops early, for example after `when` beco
 
 The components pass the other attributes and the children to the rendered tag.
 
-### The `awesome-reveal` host element
+### `getReveal(element)`
 
-Each component renders its tag inside an `awesome-reveal` host element with `display: contents`.
+Gives the control of the reveal of a tag that `Reveal` or `Cascade` rendered. It throws for any other element. Call it in a client script.
 
-| Member         | Description                                                               |
-| -------------- | ------------------------------------------------------------------------- |
-| `when`         | Gets or sets the manual control. `null` gives the control to the viewport |
-| `revealed`     | Tells if the element is revealed                                          |
-| `reveal` event | Comes from the rendered tag and bubbles, one time for each reveal         |
+| Member     | Description                                                               |
+| ---------- | ------------------------------------------------------------------------- |
+| `when`     | Gets or sets the manual control. `null` gives the control to the viewport |
+| `revealed` | Tells if the element is revealed                                          |
+
+The rendered tag dispatches a `reveal` event that bubbles, one time for each reveal. Each component renders its tag inside a host element with `display: contents`. The host does not change the layout, but the child combinator (`>`), `:nth-child()` and `parentElement` see it.
 
 ### Behavior
 
@@ -245,7 +246,7 @@ If the parser moves the tag, the host reports an error in the browser console, a
 The package writes no `style` attribute, no inline script and no CSS at runtime. But Astro can put the package stylesheet and your scripts inline in the HTML. Use one of these setups:
 
 - Set `security.csp: true`. Astro adds a `<meta>` policy with hashes for the inline styles and scripts that it emits. Astro adds the policy only to the build, so use `astro build` and `astro preview` to check it. Astro does not support this option with the `<ClientRouter />`.
-- Send your own policy, such as `style-src 'self'; script-src 'self'`, and set `build.inlineStylesheets: 'never'`. With the default `'auto'`, Astro puts stylesheets smaller than `vite.build.assetsInlineLimit` (4 kB by default) in a `<style>` element. If the policy blocks the package stylesheet, the content does not hide before the reveal, and the `awesome-reveal` host is not `display: contents`. Also make sure that the built HTML has no inline `<script>` that your policy blocks.
+- Send your own policy, such as `style-src 'self'; script-src 'self'`, and set `build.inlineStylesheets: 'never'`. With the default `'auto'`, Astro puts stylesheets smaller than `vite.build.assetsInlineLimit` (4 kB by default) in a `<style>` element. If the policy blocks the package stylesheet, the content does not hide before the reveal, and the host element is not `display: contents`. Also make sure that the built HTML has no inline `<script>` that your policy blocks.
 
 </details>
 

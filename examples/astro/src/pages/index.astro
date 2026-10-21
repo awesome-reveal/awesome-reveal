@@ -111,19 +111,21 @@ const sides = ["top", "right", "bottom", "left"] as const;
 </Layout>
 
 <script>
+  import { getReveal } from "@awesome-reveal/astro";
+
   document.addEventListener("astro:page-load", () => {
     const toggle = document.querySelector("#toggle");
     const count = document.querySelector("#reveal-count");
     const content = document.querySelector<HTMLElement>("#manual");
-    const manual = content?.closest("awesome-reveal");
-    if (!toggle || !content || !manual) return;
+    if (!toggle || !content) return;
+    const manual = getReveal(content);
     toggle.addEventListener("click", () => {
       const open = !manual.when;
       manual.when = open;
       content.hidden = !open;
       toggle.setAttribute("aria-expanded", String(open));
     });
-    manual.addEventListener("reveal", () => {
+    content.addEventListener("reveal", () => {
       if (count) count.textContent = String(Number(count.textContent) + 1);
     });
   });
