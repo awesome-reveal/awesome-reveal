@@ -384,4 +384,53 @@ describe("adapter store", () => {
     await settle();
     expect(target.getAnimations()).toEqual([]);
   });
+
+  describe("a settled entrance", () => {
+    const print = ["beforeprint", "afterprint"];
+    let listening: () => string[];
+    beforeEach(() => {
+      const types = (spy: { mock: { calls: unknown[][] } }) =>
+        spy.mock.calls.map(([type]) => type as string).filter((type) => print.includes(type));
+      const listen = vi.spyOn(window, "addEventListener");
+      const unlisten = vi.spyOn(window, "removeEventListener");
+      listening = () => {
+        const added = types(listen);
+        for (const type of types(unlisten)) {
+          const index = added.indexOf(type);
+          if (index >= 0) added.splice(index, 1);
+        }
+        return added;
+      };
+    });
+
+    it("releases the print listeners of a cascade when every child finished", async () => {
+      const state = keep(createCascade({ ...native, when: true }));
+      state.attach(target);
+      const [first, second, third] = paragraphs().map((child) => animation(child));
+      first!.finish();
+      second!.finish();
+      await settle();
+      expect(listening()).toEqual(print);
+      third!.finish();
+      await expect.poll(listening).toEqual([]);
+    });
+
+    it("does not replay after null, and a hide fires no cancel event", async () => {
+      const animate = trackAnimations();
+      const state = keep(createReveal({ ...native, when: true }));
+      state.attach(target);
+      const entrance = animation();
+      const cancelled = vi.fn();
+      entrance.addEventListener("cancel", cancelled);
+      entrance.finish();
+      await expect.poll(listening).toEqual([]);
+      state.attach(null);
+      state.attach(target);
+      expect(animate.calls()).toHaveLength(1);
+      state.setOptions({ ...native, when: false });
+      await settle();
+      expect(cancelled).not.toHaveBeenCalled();
+      expect(entrance.playState).toBe("finished");
+    });
+  });
 });

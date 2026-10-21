@@ -60,6 +60,11 @@ function play(element: Element, options: CoreRevealOptions, interval?: number): 
   let animations = entrances(element, options, interval);
   const group = motions(animations);
   group.play();
+  // Keeps no removed cascade child. Then cancel() returns false, so the entrance does not replay.
+  Promise.allSettled(animations.map((animation) => animation?.finished)).then(() => {
+    animations = [];
+    group.dispose(true);
+  });
   return () => {
     const running = animations.some((animation) => animation?.playState === "running");
     animations = [];
