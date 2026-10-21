@@ -21,6 +21,8 @@ function start(target: RevealTarget, options: RevealOptions, interval?: number):
   for (const element of new Set(resolveTargets(target))) {
     const animations = entrances(element, options, interval);
     const group = motions(animations);
+    // A cancel() in observe() replaces finished with a promise that never settles.
+    const settled = Promise.allSettled(animations.map((animation) => animation?.finished));
     const disconnect = observe(element, options, () =>
       focused(element) ? group.dispose() : group.play(),
     );
@@ -31,9 +33,7 @@ function start(target: RevealTarget, options: RevealOptions, interval?: number):
       if (!releases.size) preference?.removeEventListener?.("change", onPreference);
     };
     releases.add(release);
-    Promise.allSettled(animations.map((animation) => animation?.finished)).then(() =>
-      release(true),
-    );
+    settled.then(() => release(true));
   }
   if (releases.size) preference?.addEventListener?.("change", onPreference);
   return { dispose };

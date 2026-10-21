@@ -653,6 +653,12 @@ describe("release without dispose", () => {
     animation().cancel();
     await released();
   });
+  it("releases an element that has focus before the reveal starts", async () => {
+    target.innerHTML = `<a href="#">a</a>`;
+    target.querySelector("a")!.focus();
+    track(reveal(target, native));
+    await released();
+  });
   it("stays safe to dispose after the finish", async () => {
     const handle = track(reveal(target, native));
     await enter();
