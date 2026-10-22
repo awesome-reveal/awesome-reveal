@@ -5,7 +5,7 @@ Reveal-on-scroll animations for Astro. Wrap content in `<Reveal>`, and it fades 
 [![npm version](https://badgen.net/npm/v/@awesome-reveal/astro)](https://www.npmjs.com/package/@awesome-reveal/astro)
 [![License](https://badgen.net/npm/license/@awesome-reveal/astro)](https://github.com/awesome-reveal/awesome-reveal/blob/next/LICENSE)
 
-> **Preview:** This is a prerelease of version 1.0. The API can change before the stable release. Tell us what works and what does not in [GitHub Discussions](https://github.com/awesome-reveal/awesome-reveal/discussions).
+> **Release candidate:** This is a release candidate of version 1.0. The API is frozen, so only fixes go in before the stable release. Tell us what works and what does not in [GitHub Discussions](https://github.com/awesome-reveal/awesome-reveal/discussions).
 
 <p align="center"><img src="https://raw.githubusercontent.com/awesome-reveal/awesome-reveal/next/.github/assets/demo.gif" alt="Elements fade, slide, scale, blur and rotate in as the page scrolls" width="640"></p>
 

@@ -8,7 +8,7 @@ Reveal-on-scroll animations for React, Vue, Astro and plain JavaScript. Content 
 [![GitHub stars](https://badgen.net/github/stars/awesome-reveal/awesome-reveal)](https://github.com/awesome-reveal/awesome-reveal/stargazers)
 [![License](https://badgen.net/github/license/awesome-reveal/awesome-reveal)](LICENSE)
 
-> **Preview:** The `@awesome-reveal/*` packages are a prerelease of version 1.0. The API can change before the stable release. Tell us what works and what does not in [GitHub Discussions](https://github.com/awesome-reveal/awesome-reveal/discussions).
+> **Release candidate:** The `@awesome-reveal/*` packages are a release candidate of version 1.0. The API is frozen, so only fixes go in before the stable release. Tell us what works and what does not in [GitHub Discussions](https://github.com/awesome-reveal/awesome-reveal/discussions).
 
 <p align="center"><img src="https://raw.githubusercontent.com/awesome-reveal/awesome-reveal/next/.github/assets/demo.gif" alt="Elements fade, slide, scale, blur and rotate in as the page scrolls" width="640"></p>
 
