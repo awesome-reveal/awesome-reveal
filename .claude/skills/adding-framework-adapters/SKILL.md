@@ -16,7 +16,7 @@ Keep the item of the adapter on the plan board, https://github.com/orgs/awesome-
    - The framework peer dependency and its dev dependencies.
    - The JSX options in `tsconfig.json`, such as `jsxImportSource`. Remove them if the framework has no JSX.
 
-   Keep `"@awesome-reveal/core": "workspace:^"`, and keep `"version"` equal to the other packages. Add the package to the `paths` in `tsconfig.base.json`, so that the example type-checks against the sources.
+   Keep `"@awesome-reveal/core": "workspace:*"`, and keep `"version"` equal to the other packages. Add the package to the `paths` in `tsconfig.base.json`, so that the example type-checks against the sources.
 
 2. Prefer plain TypeScript sources, such as render functions, when the framework allows it. Then the build needs no compiler plugin, and `vite-plugin-dts` emits the declarations. If the framework needs a compiler plugin, pass it to `defineLibConfig` in `vite.config.ts` as the second argument. Check the declarations and the output format:
    - `vite-plugin-dts` emits declarations for `.vue` files only when `@vue/language-core` is installed.
