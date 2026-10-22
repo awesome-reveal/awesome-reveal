@@ -121,7 +121,7 @@ For a long list, a virtualized list, or a grid that is taller than the viewport,
 
 ### Control the reveal
 
-`when` controls the entrance from your state. `true` plays it, and `false` resets it with no exit animation. With `null` or no value, the viewport controls it.
+`when` controls the entrance from your state. `true` plays it, and `false` resets it with no exit animation. With `null` or no value, the viewport controls it. A change from `true` to `null` keeps the element revealed.
 
 `when` does not show or hide content. With `when: false`, the element is transparent, but screen readers read it and the keyboard can focus it. `inert` does not hide content: it only blocks focus, clicks and assistive technology. To hide content, also set `hidden`, or use `v-if`:
 

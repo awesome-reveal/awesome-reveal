@@ -101,7 +101,7 @@ For a long list, or a grid that is taller than the viewport, wrap each item in `
 
 ### Control the reveal
 
-`when` controls the entrance. `true` plays it, and `false` resets it with no exit animation. Without `when`, the viewport controls it. In a client script, pass the rendered tag to `getReveal`, and set the `when` property of the result.
+`when` controls the entrance. `true` plays it, and `false` resets it with no exit animation. Without `when`, the viewport controls it. A change from `true` to `null` keeps the element revealed. In a client script, pass the rendered tag to `getReveal`, and set the `when` property of the result.
 
 `when` does not show or hide content. With `when={false}`, the element is transparent, but screen readers read it and the keyboard can focus it. `inert` does not hide content: it only blocks focus, clicks and assistive technology. To hide content, also set `hidden` on the rendered tag:
 

@@ -1,7 +1,7 @@
 import type { CascadeOptions } from "@awesome-reveal/core/adapter";
 
 import { easing } from "./entrance-fixtures";
-import { createStage, intersect, scrollToTop, settle, showPart } from "./layout";
+import { createStage, intersect, scrollIntoView, scrollToTop, settle, showPart } from "./layout";
 import { setReducedMotion } from "./reduced-motion";
 import { collectReports, collectWindowErrors } from "./reports";
 import { expectSame, trackAnimations, trackObservers } from "./spies";
@@ -358,6 +358,21 @@ export function describeContract(name: string, harness: Harness) {
       await settle();
       expect(hidden(m.element())).toBe(true);
       expect(animate.calls()).toHaveLength(0);
+    });
+
+    it.each([
+      ["below the fold", false],
+      ["in view", true],
+    ])("a change from when: true to null keeps the element revealed %s", async (_, inView) => {
+      const onReveal = vi.fn();
+      const m = await mount({ when: true, onReveal });
+      if (inView) scrollIntoView(m.element());
+      await rerender(m, { when: null, onReveal });
+      await settle();
+      expect(shown(m.element())).toBe(true);
+      expect(observers.observerOf(m.element())).toBeUndefined();
+      expect(animate.calls()).toHaveLength(1);
+      expect(onReveal).toHaveBeenCalledOnce();
     });
 
     it("a change from when: false to null with focus inside shows the element at once with no entrance", async () => {

@@ -320,7 +320,8 @@ describe("getReveal", () => {
     reveal.when = null;
     expect(host.hasAttribute("when")).toBe(false);
     expect(reveal.when).toBeNull();
-    expect(observers.observerOf(element)).toBeDefined();
+    expect(reveal.revealed).toBe(true);
+    expect(observers.observerOf(element)).toBeUndefined();
   });
 
   it("plays the entrance again after `when` changes to false and to true in one task", async () => {

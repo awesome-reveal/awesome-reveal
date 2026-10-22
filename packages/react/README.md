@@ -119,7 +119,7 @@ Spread `getProps()` on one DOM element. If you have your own `ref`, give it to `
 
 ### Control the reveal
 
-`when` controls the entrance from your state. `true` plays it, and `false` resets it with no exit animation. Without `when`, the viewport controls it.
+`when` controls the entrance from your state. `true` plays it, and `false` resets it with no exit animation. Without `when`, the viewport controls it. A change from `true` to no value keeps the element revealed.
 
 `when` does not show or hide content. With `when={false}`, the element is transparent, but screen readers read it and the keyboard can focus it. `inert` does not hide content: it only blocks focus, clicks and assistive technology. To hide content, also set `hidden`, or do not render it:
 
