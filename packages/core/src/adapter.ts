@@ -8,7 +8,7 @@ import type {
 
 /** Configures a declarative entrance and optional manual control. */
 export type RevealOptions = CoreRevealOptions & {
-  /** Controls the entrance manually. `true` reveals, `false` resets the entrance, and no value or `null` lets the viewport decide. It does not show or hide content. With `false`, the element is transparent, but screen readers read it and the keyboard can focus its controls. To hide content, use `hidden`, or do not render it. `inert` does not hide the element. It only blocks focus, clicks and assistive technology. Reduced motion reveals the element also when `when` is `false`. */
+  /** Controls the entrance manually. `true` reveals, `false` resets the entrance, and no value or `null` lets the viewport decide. A change from `true` to `null` keeps the element revealed. It does not show or hide content. With `false`, the element is transparent, but screen readers read it and the keyboard can focus its controls. To hide content, use `hidden`, or do not render it. `inert` does not hide the element. It only blocks focus, clicks and assistive technology. Reduced motion reveals the element also when `when` is `false`. */
   when?: boolean | null;
   /** Runs one time for each reveal, also when no entrance plays, such as with reduced motion or focus. */
   onReveal?: (element: Element) => void;
@@ -98,7 +98,7 @@ function createStore<Options extends CascadeOptions>(
     if (preference?.matches && element) {
       cancel();
       disconnect();
-      set(true);
+      set((inView = true));
     }
   }
 
@@ -133,13 +133,11 @@ function createStore<Options extends CascadeOptions>(
   function connect() {
     disconnect();
     disconnect = () => {};
-    if (preference?.matches && element) return set(true);
-    if (element && typeof element.animate !== "function") return set(true);
-    if (current.when != null) {
-      // No observer watches the element while `when` controls the reveal, so the last report is stale.
-      inView = false;
-      return set(current.when);
-    }
+    // `when` on an attached element sets `inView`, so a later `null` or `threshold` keeps its result.
+    if (element && current.when != null) inView = current.when;
+    if (preference?.matches && element) return set((inView = true));
+    if (element && typeof element.animate !== "function") return set((inView = true));
+    if (current.when != null) return set(current.when);
     set(inView);
     if (element && !inView) disconnect = observe(element, current, () => set((inView = true)));
   }

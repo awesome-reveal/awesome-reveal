@@ -230,6 +230,21 @@ describe("createReveal", () => {
     expect(observers.live()).toEqual([]);
   });
 
+  it("observes the next element after when changes from true to null with no element", () => {
+    const observers = trackObservers();
+    const animate = trackAnimations();
+    const [first, second] = paragraphs();
+    const state = keep(createReveal(options));
+    state.attach(first);
+    state.attach(null);
+    state.setOptions({ ...options, when: true });
+    state.setOptions({ ...options, when: null });
+    state.attach(second);
+    expect(state.revealed).toBe(false);
+    expect(animate.calls()).toEqual([]);
+    expect(observers.observerOf(second)).toBe(observers.live()[0]);
+  });
+
   it("cancels the animation and stops observing when it gets null", async () => {
     const observers = trackObservers();
     const state = keep(createReveal(options));
