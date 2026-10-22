@@ -100,7 +100,15 @@ export function entrances(element: Element, options: RevealOptions, interval?: n
 
 export function motions(element: Element, animations: (Animation | undefined)[]): Motions {
   const finish = () => {
-    for (const animation of animations) if (animation?.playState === "running") animation.finish();
+    for (const animation of animations)
+      if (animation?.playState === "running")
+        try {
+          animation.finish();
+        } catch (error) {
+          // An entrance with no end, such as `duration: Infinity`, cannot finish.
+          report(error);
+          animation.cancel();
+        }
   };
   const group: Motions = {
     play() {

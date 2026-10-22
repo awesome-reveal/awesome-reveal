@@ -352,11 +352,22 @@ export function describeContract(name: string, harness: Harness) {
       await expect(entrance[0]!.finished).resolves.toBeDefined();
     });
 
-    it("unmount stops listening to focus", async () => {
+    it("a focusin with no real focus before the reveal plays the entrance", async () => {
+      const m = await mount({ duration: 60_000 });
+      m.element().dispatchEvent(new FocusEvent("focusin"));
+      await expect.element(m.element()).not.toHaveAttribute("data-awesome-reveal");
+      expect(animate.calls().map(({ animation }) => animation.playState)).toEqual(["running"]);
+    });
+
+    it.each([
+      ["before the reveal", false],
+      ["during the entrance", true],
+    ])("unmount %s stops listening to focus", async (_, entering) => {
       const listen = vi.spyOn(HTMLElement.prototype, "addEventListener");
       const unlisten = vi.spyOn(HTMLElement.prototype, "removeEventListener");
-      const m = await mount();
+      const m = await mount({ duration: 60_000 });
       const element = m.element();
+      if (entering) await intersect(element);
       const focusListeners = (spy: typeof listen | typeof unlisten) =>
         new Set(
           spy.mock.calls

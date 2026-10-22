@@ -252,6 +252,14 @@ describe("zero-CSS reveal", () => {
       link().focus();
       await expectShown(target);
     });
+    it("during an entrance that cannot finish", async () => {
+      const reports = collectReports();
+      track(reveal(target, { duration: Infinity }));
+      await enter();
+      link().focus();
+      await expectShown(target);
+      expect(await reports()).toEqual([expect.objectContaining({ name: "InvalidStateError" })]);
+    });
     it("during the interval of a later child of a cascade", async () => {
       track(cascade(target, { duration: 60_000, interval: 10_000 }));
       await enter(target.firstElementChild as HTMLElement);
