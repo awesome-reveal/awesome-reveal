@@ -348,7 +348,7 @@ importers:
   packages/astro:
     dependencies:
       '@awesome-reveal/core':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../core
     devDependencies:
       astro:
@@ -360,7 +360,7 @@ importers:
   packages/react:
     dependencies:
       '@awesome-reveal/core':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../core
     devDependencies:
       '@types/react':
@@ -401,7 +401,7 @@ importers:
   packages/vue:
     dependencies:
       '@awesome-reveal/core':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../core
     devDependencies:
       vitest-browser-vue:

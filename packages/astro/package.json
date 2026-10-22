@@ -64,7 +64,7 @@
     "check:package": "tsc -p test/package && publint --strict && attw --pack . --ignore-rules cjs-resolves-to-esm"
   },
   "dependencies": {
-    "@awesome-reveal/core": "workspace:^"
+    "@awesome-reveal/core": "workspace:*"
   },
   "devDependencies": {
     "astro": "catalog:"
