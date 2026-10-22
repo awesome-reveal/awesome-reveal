@@ -1,3 +1,4 @@
+import { focused } from "./observe.js";
 import { report } from "./report.js";
 import type { CascadeOptions, RevealOptions, StartState } from "./types.js";
 
@@ -100,6 +101,7 @@ export function entrances(element: Element, options: RevealOptions, interval?: n
 
 export function motions(element: Element, animations: (Animation | undefined)[]): Motions {
   const finish = () => {
+    if (!focused(element)) return;
     for (const animation of animations)
       if (animation?.playState === "running")
         try {

@@ -352,6 +352,13 @@ export function describeContract(name: string, harness: Harness) {
       await expect(entrance[0]!.finished).resolves.toBeDefined();
     });
 
+    it("a focusin with no real focus during the entrance does not finish it", async () => {
+      const m = await mount({ duration: 60_000 });
+      await intersect(m.element());
+      m.element().dispatchEvent(new FocusEvent("focusin"));
+      expect(animate.calls().map(({ animation }) => animation.playState)).toEqual(["running"]);
+    });
+
     it("a focusin with no real focus before the reveal plays the entrance", async () => {
       const m = await mount({ duration: 60_000 });
       m.element().dispatchEvent(new FocusEvent("focusin"));
