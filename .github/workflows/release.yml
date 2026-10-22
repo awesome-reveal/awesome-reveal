@@ -108,6 +108,22 @@ jobs:
             echo "::error::$* did not show on npm in 20 minutes. Check it with npm stage list."
             return 1
           }
+          # pnpm cannot see a version in the malware scan, so a re-run can publish it again. Match the text: a plain 403 can be OIDC.
+          publish() {
+            for attempt in {0..3}; do
+              if ((attempt)); then sleep $((attempt * 30)); fi
+              pnpm --filter "./$path" publish --no-git-checks --tag "$tag" 2>&1 | tee "$RUNNER_TEMP/publish.log" && return 0
+              # pnpm wraps its errors at 80 columns with "│".
+              local log
+              log=$(tr -d '\n│' <"$RUNNER_TEMP/publish.log" | tr -s ' ')
+              if [[ $log == *"previously staged version"* || $log == *"cannot publish over the previously published versions: $version."* ]]; then
+                echo "::warning::npm already has $name@$version."
+                return 0
+              fi
+              [[ $log =~ status\ 5[0-9]{2} ]] || return 1
+            done
+            return 1
+          }
           published=()
           # The adapters depend on core, so core goes first, and the job waits until core shows on npm.
           for path in $(jq -r 'sort_by(. != "packages/core") | .[]' <<<"$PATHS_RELEASED"); do
@@ -121,11 +137,7 @@ jobs:
             fi
             tag=latest
             if [[ $version == *-* && -n $current && $current != *-* ]]; then tag=next; fi
-            # A re-run while npm stages a version gets a 409 "previously staged version".
-            if ! pnpm --filter "./$path" publish --no-git-checks --tag "$tag" 2>&1 | tee "$RUNNER_TEMP/publish.log"; then
-              grep -q 'previously staged version' "$RUNNER_TEMP/publish.log"
-              echo "::warning::npm already staged $name@$version."
-            fi
+            publish || exit 1
             published+=("$name@$version")
             if [[ $path == packages/core ]]; then wait_for_npm "$name@$version"; fi
           done
