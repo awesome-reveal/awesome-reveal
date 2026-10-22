@@ -58,7 +58,7 @@ const restarts = ["when", "threshold"] as const;
 // The cancel function tells if the entrance was still running.
 function play(element: Element, options: CoreRevealOptions, interval?: number): () => boolean {
   let animations = entrances(element, options, interval);
-  const group = motions(animations);
+  const group = motions(element, animations);
   group.play();
   // Keeps no removed cascade child. Then cancel() returns false, so the entrance does not replay.
   Promise.allSettled(animations.map((animation) => animation?.finished)).then(() => {

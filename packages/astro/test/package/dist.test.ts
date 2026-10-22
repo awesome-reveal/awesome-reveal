@@ -104,7 +104,7 @@ describe("a static build of a page with the published component", () => {
 
     expect(host).toHaveLength(1);
     expect(control).toHaveLength(1);
-    expect(host[0]!.length).toBeLessThan(5150);
+    expect(host[0]!.length).toBeLessThan(5225);
     expect(control[0]!.length).toBeLessThan(600);
   });
 });

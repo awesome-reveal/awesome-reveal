@@ -44,6 +44,12 @@ const focusChild = (m: Mounted, index = 0) => {
   expect(m.element().getBoundingClientRect().top).toBeGreaterThan(innerHeight);
 };
 
+const focusInView = (m: Mounted, index = 0) => {
+  const child = Array.from(m.element().children).at(index) as HTMLElement;
+  child.tabIndex = -1;
+  child.focus();
+};
+
 let run = 0;
 
 function createMount(harness: Harness) {
@@ -336,11 +342,39 @@ export function describeContract(name: string, harness: Harness) {
       expect(onReveal).toHaveBeenCalledOnce();
     });
 
-    it("unmount stops listening to focus", async () => {
+    it("focus during the entrance delay finishes the entrance", async () => {
+      const m = await mount({ delay: 60_000 });
+      await intersect(m.element());
+      const entrance = animate.calls().map(({ animation }) => animation);
+      expect(entrance.map((animation) => animation.playState)).toEqual(["running"]);
+      focusInView(m);
+      expect(entrance.map((animation) => animation.playState)).toEqual(["finished"]);
+      await expect(entrance[0]!.finished).resolves.toBeDefined();
+    });
+
+    it("a focusin with no real focus during the entrance does not finish it", async () => {
+      const m = await mount({ duration: 60_000 });
+      await intersect(m.element());
+      m.element().dispatchEvent(new FocusEvent("focusin"));
+      expect(animate.calls().map(({ animation }) => animation.playState)).toEqual(["running"]);
+    });
+
+    it("a focusin with no real focus before the reveal plays the entrance", async () => {
+      const m = await mount({ duration: 60_000 });
+      m.element().dispatchEvent(new FocusEvent("focusin"));
+      await expect.element(m.element()).not.toHaveAttribute("data-awesome-reveal");
+      expect(animate.calls().map(({ animation }) => animation.playState)).toEqual(["running"]);
+    });
+
+    it.each([
+      ["before the reveal", false],
+      ["during the entrance", true],
+    ])("unmount %s stops listening to focus", async (_, entering) => {
       const listen = vi.spyOn(HTMLElement.prototype, "addEventListener");
       const unlisten = vi.spyOn(HTMLElement.prototype, "removeEventListener");
-      const m = await mount();
+      const m = await mount({ duration: 60_000 });
       const element = m.element();
+      if (entering) await intersect(element);
       const focusListeners = (spy: typeof listen | typeof unlisten) =>
         new Set(
           spy.mock.calls
@@ -421,7 +455,7 @@ export function describeContract(name: string, harness: Harness) {
       focusChild(m);
       await rerender(m, { when: false });
       expect(hidden(m.element())).toBe(true);
-      expect(animate.active()).toHaveLength(0);
+      expect(animate.active().filter(({ playState }) => playState !== "finished")).toHaveLength(0);
       expect(document.activeElement).toBe(m.element().children[0]);
     });
 
@@ -543,6 +577,17 @@ export function describeCascadeContract(name: string, harness: Harness) {
       await expect.element(m.element()).not.toHaveAttribute("data-awesome-reveal");
       expect(shown(m.element())).toBe(true);
       expect(animate.calls()).toHaveLength(0);
+    });
+
+    it("focus in a later child during the interval finishes all the entrances", async () => {
+      const m = await mount({ interval: 10_000, duration: 60_000 });
+      await intersect(m.element());
+      focusInView(m, -1);
+      expect(animate.calls().map(({ animation }) => animation.playState)).toEqual([
+        "finished",
+        "finished",
+        "finished",
+      ]);
     });
 
     it("focus in a child does not reveal the children with when: false", async () => {

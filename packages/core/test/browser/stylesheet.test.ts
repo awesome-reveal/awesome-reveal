@@ -182,9 +182,26 @@ describe("reveal.css", () => {
     it("shows server markup that has focus before the attach", () => {
       target.setAttribute("data-awesome-reveal", "hidden");
       last().focus();
-      expect(opacity(target)).toBe("0");
+      expect(opacity(target)).toBe("1");
       bindStore({ delay: 60_000 });
       expectShown(target);
+    });
+
+    it("shows all the children of cascade server markup that has focus before the attach", () => {
+      target.setAttribute("data-awesome-reveal", "cascade");
+      last().focus();
+      for (const child of target.children) expect(opacity(child)).toBe("1");
+    });
+
+    it("keeps the hold time when focus leaves server markup", () => {
+      target.setAttribute("data-awesome-reveal", "hidden");
+      last().focus();
+      last().blur();
+      expect(opacity(target)).toBe("0");
+      hold(target)!.finish();
+      last().focus();
+      last().blur();
+      expect(opacity(target)).toBe("1");
     });
 
     it("keeps the element hidden with when: false", async () => {
