@@ -403,7 +403,6 @@ export function describeContract(name: string, harness: Harness) {
       focusChild(m);
       await rerender(m, { when: false });
       expect(hidden(m.element())).toBe(true);
-      // Focus finishes the entrance, and a finished entrance has no effect.
       expect(animate.active().filter(({ playState }) => playState !== "finished")).toHaveLength(0);
       expect(document.activeElement).toBe(m.element().children[0]);
     });
