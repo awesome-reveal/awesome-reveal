@@ -47,7 +47,7 @@ The content fades in and moves up one time, when it enters the viewport.
 <Reveal from="left">From the left</Reveal>
 ```
 
-For a different entrance, give a start state. The element animates from this state to its resting style. A start state replaces the default, so add `opacity: 0` if you want a fade.
+For a different entrance, give a start state. The element animates from this state to neutral values: full opacity, no offset, a scale of 1, no rotation and no blur. The element's own value of an animated property applies only after the entrance ends. A start state replaces the default, so add `opacity: 0` if you want a fade.
 
 ```astro
 <Reveal from={{ opacity: 0 }}>Fade only</Reveal>
@@ -138,13 +138,13 @@ The rendered tag dispatches a `reveal` event that bubbles, when the reveal start
 ```ts
 document.addEventListener("reveal", (event) => {
   const element = event.target as Element;
-  Promise.all(element.getAnimations({ subtree: true }).map((animation) => animation.finished))
+  Promise.all(element.getAnimations().map((animation) => animation.finished))
     .then(() => element.classList.add("entered"))
     .catch(() => {});
 });
 ```
 
-The promise rejects when the entrance stops early, for example after `when` becomes `false`. Catch the rejection. It resolves at once when no entrance plays, for example with reduced motion. It also waits for your own animations of the element and its descendants.
+The promise rejects when the entrance stops early, for example after `when` becomes `false`. Catch the rejection. It resolves at once when no entrance plays, for example with reduced motion. It also waits for your own animations of the element. For a cascade, use `getAnimations({ subtree: true })`, because the children animate. An animation that repeats forever never finishes, so the promise does not resolve.
 
 ## API
 
