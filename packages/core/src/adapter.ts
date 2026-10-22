@@ -98,7 +98,7 @@ function createStore<Options extends CascadeOptions>(
     if (preference?.matches && element) {
       cancel();
       disconnect();
-      set(true);
+      set((inView = true));
     }
   }
 
@@ -133,10 +133,10 @@ function createStore<Options extends CascadeOptions>(
   function connect() {
     disconnect();
     disconnect = () => {};
-    // A later `null` keeps this result, so a revealed element does not hide again.
+    // Each reveal sets `inView`, so a later `null` or `threshold` does not hide the element again.
     if (current.when != null) inView = current.when;
-    if (preference?.matches && element) return set(true);
-    if (element && typeof element.animate !== "function") return set(true);
+    if (preference?.matches && element) return set((inView = true));
+    if (element && typeof element.animate !== "function") return set((inView = true));
     if (current.when != null) return set(current.when);
     set(inView);
     if (element && !inView) disconnect = observe(element, current, () => set((inView = true)));
