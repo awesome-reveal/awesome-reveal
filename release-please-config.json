@@ -6,23 +6,28 @@
   "tag-separator": "@",
   "versioning": "prerelease",
   "prerelease": true,
-  "prerelease-type": "next.0",
+  "prerelease-type": "rc.0",
   "last-release-sha": "6f8b131bd2037c43baabfc29ad85f0d5ed829c44",
   "packages": {
     "packages/astro": {
-      "component": "@awesome-reveal/astro"
+      "component": "@awesome-reveal/astro",
+      "release-as": "1.0.0-rc.0"
     },
     "packages/core": {
-      "component": "@awesome-reveal/core"
+      "component": "@awesome-reveal/core",
+      "release-as": "1.0.0-rc.0"
     },
     "packages/react": {
-      "component": "@awesome-reveal/react"
+      "component": "@awesome-reveal/react",
+      "release-as": "1.0.0-rc.0"
     },
     "packages/react-awesome-reveal": {
-      "component": "react-awesome-reveal"
+      "component": "react-awesome-reveal",
+      "release-as": "5.0.0-rc.0"
     },
     "packages/vue": {
-      "component": "@awesome-reveal/vue"
+      "component": "@awesome-reveal/vue",
+      "release-as": "1.0.0-rc.0"
     }
   },
   "plugins": [
