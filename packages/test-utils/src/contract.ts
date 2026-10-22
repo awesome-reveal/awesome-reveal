@@ -375,6 +375,17 @@ export function describeContract(name: string, harness: Harness) {
       expect(onReveal).toHaveBeenCalledOnce();
     });
 
+    it("a change from when: true to null after reduced motion ends keeps the element revealed", async () => {
+      await setReducedMotion("reduce");
+      const m = await mount({ when: true });
+      await setReducedMotion("no-preference");
+      await rerender(m, { when: null });
+      await settle();
+      expect(shown(m.element())).toBe(true);
+      expect(observers.observerOf(m.element())).toBeUndefined();
+      expect(animate.calls()).toHaveLength(0);
+    });
+
     it("a change from when: false to null with focus inside shows the element at once with no entrance", async () => {
       const onReveal = vi.fn();
       const m = await mount({ when: false, onReveal });
