@@ -243,6 +243,21 @@ describe("zero-CSS reveal", () => {
       (target.lastElementChild as HTMLElement).focus();
       await expectShown(...target.children);
     });
+    it.each([
+      ["its delay", { delay: 60_000 }],
+      ["its entrance", { duration: 60_000 }],
+    ])("during %s", async (_, options: RevealOptions) => {
+      track(reveal(target, options));
+      await enter();
+      link().focus();
+      await expectShown(target);
+    });
+    it("during the interval of a later child of a cascade", async () => {
+      track(cascade(target, { duration: 60_000, interval: 10_000 }));
+      await enter(target.firstElementChild as HTMLElement);
+      (target.lastElementChild as HTMLElement).focus();
+      await expectShown(...target.children);
+    });
     it("when the element has focus before the reveal starts", async () => {
       link().focus();
       track(reveal(target, { delay: 60_000 }));
@@ -253,7 +268,8 @@ describe("zero-CSS reveal", () => {
       const unlisten = vi.spyOn(target, "removeEventListener");
       track(reveal(target, native)).dispose();
       expect(listen).toHaveBeenCalledWith("focusin", expect.any(Function));
-      expect(unlisten.mock.calls).toEqual(listen.mock.calls);
+      expect(new Set(unlisten.mock.calls)).toEqual(new Set(listen.mock.calls));
+      expect(unlisten).toHaveBeenCalledTimes(listen.mock.calls.length);
     });
   });
   it("reveals an element taller than its scroll container when it leaves before the threshold", async () => {

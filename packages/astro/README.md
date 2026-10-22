@@ -204,7 +204,8 @@ If the parser moves the tag, the host reports an error in the browser console, a
 
 - With `prefers-reduced-motion: reduce`, all the content shows immediately, with no animation.
 - Focus in a waiting element shows it at once, so a keyboard user does not focus invisible content. This does not apply with `when={false}`.
-- Focus during a running entrance or its delay does not shorten it, so keep `delay` and `interval` short.
+- Focus during the delay or the entrance finishes the entrance at once.
+- Focus in server markup shows it also before the script loads.
 - Waiting content shows in print and when JavaScript is off.
 - Hidden content stays in the accessibility tree. Do not make important content depend on decorative motion.
 

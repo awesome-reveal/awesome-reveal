@@ -20,7 +20,7 @@ function start(target: RevealTarget, options: RevealOptions, interval?: number):
   if (preference?.matches) return { dispose };
   for (const element of new Set(resolveTargets(target))) {
     const animations = entrances(element, options, interval);
-    const group = motions(animations);
+    const group = motions(element, animations);
     let disconnect: (() => void) | undefined;
     const release = (keep?: boolean) => {
       if (!releases.delete(release)) return;

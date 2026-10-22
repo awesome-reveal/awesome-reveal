@@ -4,6 +4,11 @@
   [data-awesome-reveal="cascade"] > * {
     animation: awesome-reveal-hold 5s !important;
   }
+  /* A new duration keeps the start time, so a blur does not restart the hold. */
+  [data-awesome-reveal="hidden"]:focus-within,
+  [data-awesome-reveal="cascade"]:focus-within > * {
+    animation-duration: 0s !important;
+  }
   [data-awesome-reveal="hidden"][data-awesome-reveal-attached],
   [data-awesome-reveal="cascade"][data-awesome-reveal-attached] > * {
     opacity: 0 !important;
