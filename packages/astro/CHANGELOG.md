@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.0.0-rc.0](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/astro@1.0.0-next.12...@awesome-reveal/astro@1.0.0-rc.0) (2026-10-22)
+
+
+### Bug Fixes
+
+* **core:** keep the reveal when `when` changes from true to null ([#336](https://github.com/awesome-reveal/awesome-reveal/issues/336)) ([a807df7](https://github.com/awesome-reveal/awesome-reveal/commit/a807df75f683305a76a790a78c6977cb5e254530))
+* mark the packages as a release candidate in the READMEs ([#340](https://github.com/awesome-reveal/awesome-reveal/issues/340)) ([ef6ed29](https://github.com/awesome-reveal/awesome-reveal/commit/ef6ed2953a5e9120238d669d0dbf61721b531fbe))
+* show focused content before hydration and during the entrance delay ([#335](https://github.com/awesome-reveal/awesome-reveal/issues/335)) ([5fd14a9](https://github.com/awesome-reveal/awesome-reveal/commit/5fd14a94c60cc66fba133612e64796c66029d7a6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @awesome-reveal/core bumped to 1.0.0-rc.0
+
 ## [1.0.0-next.12](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/astro@1.0.0-next.11...@awesome-reveal/astro@1.0.0-next.12) (2026-10-21)
 
 
