@@ -173,7 +173,7 @@ The package also exports the types `Side`, `StartState`, `RevealOptions`, `Casca
 
 - With `prefers-reduced-motion: reduce`, all the content shows immediately, with no animation and no delay. If the preference changes, core cancels the waiting and the running animations.
 - Focus in a waiting element shows it at once, so a keyboard user does not focus invisible content. Focus in a waiting cascade container shows all its children.
-- Focus during a running entrance or its delay does not shorten it, so keep `delay` and `interval` short.
+- Focus during the delay or the entrance finishes the entrance at once.
 - Waiting content shows in print. After the print, it waits again. Core uses the `beforeprint` and `afterprint` events, so a print emulation in developer tools does not show the content.
 - Hidden content stays in the accessibility tree. Do not make important content depend on decorative motion.
 

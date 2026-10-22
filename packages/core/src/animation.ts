@@ -1,3 +1,4 @@
+import { focused } from "./observe.js";
 import { report } from "./report.js";
 import type { CascadeOptions, RevealOptions, StartState } from "./types.js";
 
@@ -98,7 +99,19 @@ export function entrances(element: Element, options: RevealOptions, interval?: n
   return targets.map((target, index) => motion(target, options, delay + index * (interval ?? 0)));
 }
 
-export function motions(animations: (Animation | undefined)[]): Motions {
+export function motions(element: Element, animations: (Animation | undefined)[]): Motions {
+  const finish = () => {
+    if (!focused(element)) return;
+    for (const animation of animations)
+      if (animation?.playState === "running")
+        try {
+          animation.finish();
+        } catch (error) {
+          // An entrance with no end, such as `duration: Infinity`, cannot finish.
+          report(error);
+          animation.cancel();
+        }
+  };
   const group: Motions = {
     play() {
       for (const animation of animations)
@@ -119,11 +132,13 @@ export function motions(animations: (Animation | undefined)[]): Motions {
     // A settled group passes keep: cancel() on a finished animation fires a cancel event and makes it idle.
     dispose(keep) {
       if (!keep) for (const animation of animations) animation?.cancel();
+      element.removeEventListener("focusin", finish);
       animations = [];
       following.delete(group);
       if (!following.size) listenPrint("removeEventListener");
     },
   };
+  element.addEventListener("focusin", finish);
   following.add(group);
   listenPrint("addEventListener");
   return group;

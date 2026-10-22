@@ -208,7 +208,8 @@ The server markup is hidden until the element reveals. If the script fails, the 
 
 - With `prefers-reduced-motion: reduce`, all the content shows immediately, with no animation. Reduced motion has priority over the entrance and over `when: false`, so the `reveal` event and `onReveal` do not run again.
 - Focus in a waiting element shows it at once, so a keyboard user does not focus invisible content. This does not apply with `when: false`.
-- Focus during a running entrance or its delay does not shorten it, so keep `delay` and `interval` short.
+- Focus during the delay or the entrance finishes the entrance at once.
+- Before the script loads, server markup shows while it has focus.
 - Waiting content shows in print and when JavaScript is off.
 - Hidden content stays in the accessibility tree. Do not make important content depend on decorative motion.
 
