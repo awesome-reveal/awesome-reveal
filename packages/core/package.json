@@ -1,6 +1,6 @@
 {
   "name": "@awesome-reveal/core",
-  "version": "1.0.0-next.12",
+  "version": "1.0.0-rc.0",
   "description": "Framework-independent core of awesome-reveal: reveal-on-scroll with IntersectionObserver and the Web Animations API.",
   "keywords": [
     "animate-on-scroll",
