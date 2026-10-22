@@ -133,8 +133,8 @@ function createStore<Options extends CascadeOptions>(
   function connect() {
     disconnect();
     disconnect = () => {};
-    // Each reveal sets `inView`, so a later `null` or `threshold` does not hide the element again.
-    if (current.when != null) inView = current.when;
+    // `when` on an attached element sets `inView`, so a later `null` or `threshold` keeps its result.
+    if (element && current.when != null) inView = current.when;
     if (preference?.matches && element) return set((inView = true));
     if (element && typeof element.animate !== "function") return set((inView = true));
     if (current.when != null) return set(current.when);
