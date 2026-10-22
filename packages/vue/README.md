@@ -9,7 +9,7 @@ Reveal-on-scroll animations for Vue. Wrap content in `<Reveal>`, or add `v-revea
 
 <p align="center"><img src="https://raw.githubusercontent.com/awesome-reveal/awesome-reveal/next/.github/assets/demo.gif" alt="Elements fade, slide, scale, blur and rotate in as the page scrolls" width="640"></p>
 
-- **Simple.** One component, a directive, and a few options.
+- **Simple.** Two components, two directives, and a few options.
 - **Native.** Built on IntersectionObserver and the Web Animations API, with no animation library.
 - **SSR-ready.** Server-rendered content stays hidden until it reveals, with no flash.
 - **Accessible.** Obeys the reduced-motion preference, and shows waiting content on focus and in print.
@@ -55,7 +55,7 @@ The content fades in and moves up one time, when it enters the viewport.
 </template>
 ```
 
-For a different entrance, give a start state. The element animates from this state to its resting style. A start state replaces the default, so add `opacity: 0` if you want a fade.
+For a different entrance, give a start state. The element animates from this state to neutral values: full opacity, no offset, a scale of 1, no rotation and no blur. The element's own value of an animated property applies only after the entrance ends. A start state replaces the default, so add `opacity: 0` if you want a fade.
 
 ```vue
 <template>
@@ -150,7 +150,7 @@ To play the entrance again, set `when` to `false`, then to `true`.
 import { Reveal } from "@awesome-reveal/vue";
 
 function entered(element: Element) {
-  Promise.all(element.getAnimations({ subtree: true }).map((animation) => animation.finished))
+  Promise.all(element.getAnimations().map((animation) => animation.finished))
     .then(() => element.classList.add("entered"))
     .catch(() => {});
 }
@@ -163,7 +163,7 @@ function entered(element: Element) {
 </template>
 ```
 
-The promise rejects when the entrance stops early, for example after `when: false` or an unmount. Catch the rejection. It resolves at once when no entrance plays, for example with reduced motion. It also waits for your own animations of the element and its descendants.
+The promise rejects when the entrance stops early, for example after `when: false` or an unmount. Catch the rejection. It resolves at once when no entrance plays, for example with reduced motion. It also waits for your own animations of the element. For a cascade, use `getAnimations({ subtree: true })`, because the children animate. An animation that repeats forever never finishes, so the promise does not resolve.
 
 ## API
 

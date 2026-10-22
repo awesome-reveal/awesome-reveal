@@ -45,7 +45,7 @@ Use `when` for manual control: `true` reveals the element and `false` resets the
 
 `onReveal` gets the element one time for each reveal, or the container for a cascade. It runs when the reveal starts, not when the entrance ends. It runs also when no entrance plays, such as with reduced motion or focus. After `when: false`, the next reveal calls it again. With reduced motion, `when: false` does not reset the reveal, so `onReveal` does not run again.
 
-To wait for the end of the entrance, use the `finished` promises of the animations in `onReveal`. The promise waits for each animation of the element and of its descendants, also your own animations, so use it on an element that has no other animations. It resolves at once when no entrance plays. It rejects when the entrance stops early, such as after `when: false` or an unmount. Catch the rejection, or the browser reports an unhandled rejection.
+To wait for the end of the entrance, use the `finished` promises of the animations in `onReveal`. The promise waits for each animation of the element, also your own animations. An animation that repeats forever never finishes, so use the promise on an element that has no other animations. For a cascade, use `getAnimations({ subtree: true })` on the container, because its children animate. It resolves at once when no entrance plays. It rejects when the entrance stops early, such as after `when: false` or an unmount. Catch the rejection, or the browser reports an unhandled rejection.
 
 ```tsx
 import { Reveal } from "@awesome-reveal/react";
@@ -53,7 +53,7 @@ import { Reveal } from "@awesome-reveal/react";
 export const Card = () => (
   <Reveal
     onReveal={(element) =>
-      Promise.all(element.getAnimations({ subtree: true }).map((animation) => animation.finished))
+      Promise.all(element.getAnimations().map((animation) => animation.finished))
         .then(() => element.classList.add("entered"))
         .catch(() => {})
     }

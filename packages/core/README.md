@@ -47,7 +47,7 @@ Each element animates one time, when it enters the viewport.
 | `"bottom"` (default) | y: 24 px     |
 | `"left"`             | x: -24 px    |
 
-For a different entrance, give a start state. The element animates from this state to its resting style. A start state replaces the default, so add `opacity: 0` if you want a fade.
+For a different entrance, give a start state. The element animates from this state to neutral values: full opacity, no offset, a scale of 1, no rotation and no blur. The element's own value of an animated property applies only after the entrance ends. A start state replaces the default, so add `opacity: 0` if you want a fade.
 
 ```ts
 import { reveal } from "@awesome-reveal/core";
@@ -244,7 +244,7 @@ Core writes no `style` attribute, no inline script and no CSS. It uses `element.
 
 ## Browser support
 
-Chrome 104, Edge 104, Firefox 74 and Safari 14.1 (iOS 14.5), or later. A native keyframe with `composite` needs Firefox 80 or Safari 16. If IntersectionObserver or `Element.animate()` is not available, the content shows immediately and does not stay hidden.
+Chrome 104, Edge 104, Firefox 74 and Safari 14.1 (iOS 14.5), or later. A native keyframe with `composite` needs Firefox 80 or Safari 16. Without IntersectionObserver, the entrance plays at once. Without `Element.animate()`, the content shows with no animation. In both cases, the content does not stay hidden.
 
 ## Agent skills
 

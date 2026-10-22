@@ -53,12 +53,12 @@ Use `when` for manual control: `true` reveals the element and `false` resets the
 
 The rendered tag dispatches a `reveal` event that bubbles, one time for each reveal. The event fires when the reveal starts, not when the entrance ends. It also fires when no entrance plays, such as with reduced motion or focus. After `when: false`, the next reveal fires it again. With reduced motion, `when: false` does not reset the reveal, so the event does not fire again.
 
-To wait for the end of the entrance, use the `finished` promises of the animations of the event `target`. The promise waits for each animation of the element and of its descendants, also your own animations, so use it on an element that has no other animations. It resolves at once when no entrance plays. It rejects when the entrance stops early, such as after `when: false`. Catch the rejection, or the browser reports an unhandled rejection.
+To wait for the end of the entrance, use the `finished` promises of the animations of the event `target`. The promise waits for each animation of the element, also your own animations. An animation that repeats forever never finishes, so use the promise on an element that has no other animations. For a cascade, use `getAnimations({ subtree: true })` on the container, because its children animate. It resolves at once when no entrance plays. It rejects when the entrance stops early, such as after `when: false`. Catch the rejection, or the browser reports an unhandled rejection.
 
 ```ts
 document.addEventListener("reveal", (event) => {
   const element = event.target as Element;
-  Promise.all(element.getAnimations({ subtree: true }).map((animation) => animation.finished))
+  Promise.all(element.getAnimations().map((animation) => animation.finished))
     .then(() => element.classList.add("entered"))
     .catch(() => {});
 });
