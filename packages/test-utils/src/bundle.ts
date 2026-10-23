@@ -32,7 +32,8 @@ export async function bundleFixture(
       write: false,
       minify: true,
       lib: { entry: fileURLToPath(fixture), formats: ["es"] },
-      rolldownOptions: { external },
+      // Lib mode keeps whitespace and annotations in ES output, but an app bundle removes them.
+      rolldownOptions: { external, output: { minify: true, comments: false } },
     },
   })) as Rolldown.RolldownOutput[];
   const chunk = output[0]!.output.find((item) => item.type === "chunk")!;
@@ -51,7 +52,6 @@ export async function bundleFixture(
         module.renderedExports,
       ]),
   );
-  // Rolldown's //#region comments are not code.
-  const code = chunk.code.replace(/^\/\/#(end)?region.*\n/gm, "");
+  const { code } = chunk;
   return { keptExports, bytes: Buffer.byteLength(code), gzip: gzipSync(code).length, css };
 }
