@@ -68,17 +68,10 @@ jobs:
           ref: ${{ needs.release-please.outputs.sha }}
           persist-credentials: false
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      - name: Install pnpm, Node.js and the dependencies
+        uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
         with:
-          node-version-file: .nvmrc
-          package-manager-cache: false
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          require-lockfile: true
 
       # The release PR can come from a token that starts no CI, so the publish job checks the packages itself.
       - name: Test package
@@ -93,14 +86,14 @@ jobs:
         # A prerelease goes to latest while the package has no stable version, so that a plain install gets it.
         run: |
           set -o pipefail
-          # npm stages an accepted version for some minutes, and npm view cannot see it. The malware scan of
+          # npm stages an accepted version for some minutes, and pnpm view cannot see it. The malware scan of
           # npm can also hold or block a staged version, so a successful publish does not prove the release.
           wait_for_npm() {
             for attempt in {0..40}; do
               if ((attempt)); then sleep 30; fi
               local missing=()
               for spec in "$@"; do
-                [[ -n $(npm view "$spec" version --prefer-online 2>/dev/null) ]] || missing+=("$spec")
+                [[ -n $(pnpm view "$spec" version 2>/dev/null) ]] || missing+=("$spec")
               done
               ((${#missing[@]})) || return 0
               set -- "${missing[@]}"
@@ -131,8 +124,8 @@ jobs:
             version=$(jq -r .version "$path/package.json")
             # Only a missing package counts as "no stable version". Other errors stop the job,
             # so that a registry outage cannot send a prerelease to latest.
-            if ! current=$(npm view "$name" dist-tags.latest 2>"$RUNNER_TEMP/npm-view.log"); then
-              grep -q E404 "$RUNNER_TEMP/npm-view.log" || { cat "$RUNNER_TEMP/npm-view.log"; exit 1; }
+            if ! current=$(pnpm view "$name" dist-tags.latest 2>"$RUNNER_TEMP/view.log"); then
+              grep -q ERR_PNPM_FETCH_404 "$RUNNER_TEMP/view.log" || { cat "$RUNNER_TEMP/view.log"; exit 1; }
               current=
             fi
             tag=latest
