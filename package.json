@@ -43,8 +43,5 @@
       "version": "24.22.1",
       "onFail": "download"
     }
-  },
-  "engines": {
-    "node": ">=20.19.0"
   }
 }
