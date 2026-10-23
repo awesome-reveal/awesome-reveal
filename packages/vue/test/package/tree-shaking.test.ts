@@ -12,7 +12,7 @@ describe("consumer bundle", () => {
 
     expect(keptExports["core/dist/adapter.js"]).toContain("createReveal");
     expect(css).toBeGreaterThan(0);
-    expect(bytes + css).toBeLessThan(6550);
+    expect(bytes + css).toBeLessThan(5070);
   });
 
   it("keeps no Reveal component for the directive alone", async () => {
@@ -20,7 +20,7 @@ describe("consumer bundle", () => {
 
     expect(keptExports["core/dist/adapter.js"]).toContain("createReveal");
     expect(css).toBeGreaterThan(0);
-    expect(bytes + css).toBeLessThan(6175);
+    expect(bytes + css).toBeLessThan(4810);
     expect(keptExports).not.toHaveProperty("vue/dist/Reveal.js");
   });
 });
