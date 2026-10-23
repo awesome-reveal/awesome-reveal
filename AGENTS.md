@@ -15,7 +15,7 @@ Reveal-on-scroll animations for many frameworks, built on IntersectionObserver a
 
 ## Commands
 
-Use the Node version in `.nvmrc`.
+The scripts and `pnpm exec` use the Node version in `devEngines.runtime`. A bare `node` uses the Node on your `PATH`.
 
 - `pnpm exec playwright install --with-deps --only-shell chromium firefox webkit`: run once before the browser tests.
 - `pnpm test`: the unit, SSR, browser and Astro e2e tests. Add `--coverage` to check the CI thresholds.

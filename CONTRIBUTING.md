@@ -9,7 +9,7 @@ Thanks for your help with awesome-reveal.
 
 ## Set up
 
-1. Use the Node version in `.nvmrc`.
+1. Install [pnpm](https://pnpm.io/installation) 12. pnpm downloads the Node version that `devEngines` in `package.json` declares.
 2. Run `pnpm install`.
 3. Read [`AGENTS.md`](AGENTS.md) for the map of the workspace and the commands for the build, the tests and the lint.
 
