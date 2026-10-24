@@ -8,12 +8,12 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/node": "^11.1.7",
+    "@astrojs/node": "^11.1.9",
     "@awesome-reveal/astro": "workspace:*",
     "astro": "catalog:"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
+    "@astrojs/check": "^0.9.12",
     "typescript": "^5.7.2"
   }
 }
