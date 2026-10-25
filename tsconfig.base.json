@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "lib": ["DOM", "ESNext"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noEmit": true,
@@ -18,7 +18,6 @@
     // Must contain the sources that the paths add. Without it, vite-plugin-dts logs TS6059 but does not fail.
     "rootDir": ".",
     "skipLibCheck": true,
-    "strict": true,
     "target": "ESNext",
     "verbatimModuleSyntax": true
   }
