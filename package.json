@@ -19,8 +19,8 @@
     "@commitlint/config-conventional": "21.2.3",
     "@types/node": "^24.19.1",
     "@vitejs/plugin-vue": "^6.0.10",
-    "@vitest/browser-playwright": "^5.0.4",
-    "@vitest/coverage-istanbul": "^5.0.4",
+    "@vitest/browser-playwright": "^5.0.5",
+    "@vitest/coverage-istanbul": "^5.0.5",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "oxfmt": "^0.73.0",
@@ -30,7 +30,7 @@
     "typescript": "^5.7.2",
     "vite": "catalog:",
     "vite-plugin-dts": "^5.1.2",
-    "vitest": "^5.0.4"
+    "vitest": "^5.0.5"
   },
   "devEngines": {
     "packageManager": {
