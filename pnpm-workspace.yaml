@@ -10,7 +10,7 @@ allowBuilds:
 catalog:
   "@types/react": ^19.3.0
   "@types/react-dom": ^19.3.0
-  astro: ^7.3.8
+  astro: ^7.4.2
   next: ^16.4.2
   react: ^19.3.1
   react-dom: ^19.3.1
