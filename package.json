@@ -17,7 +17,7 @@
     "@arethetypeswrong/cli": "^0.18.5",
     "@commitlint/cli": "21.2.3",
     "@commitlint/config-conventional": "21.2.3",
-    "@types/node": "^24.19.1",
+    "@types/node": "^24.19.2",
     "@vitejs/plugin-vue": "^6.0.10",
     "@vitest/browser-playwright": "^5.0.5",
     "@vitest/coverage-istanbul": "^5.0.5",
