@@ -14,7 +14,7 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^24.19.1",
+    "@types/node": "^24.19.2",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "typescript": "^5.7.2"
