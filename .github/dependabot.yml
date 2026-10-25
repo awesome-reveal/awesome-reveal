@@ -2,18 +2,23 @@ version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
-    # Point back to main once next is merged into it.
-    target-branch: next
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     groups:
       github-actions:
         patterns: ["*"]
   - package-ecosystem: npm
     directory: /
-    target-branch: next
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
+    ignore:
+      # devEngines.runtime pins Node 24.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     # A dependency joins the first group that matches it.
     groups:
       astro:
@@ -38,3 +43,19 @@ updates:
           - vitest
           - "@vitest/*"
           - "vitest-browser-*"
+      commitlint:
+        patterns:
+          - "@commitlint/*"
+      oxc:
+        patterns:
+          - oxlint
+          - oxfmt
+      # Update the Playwright image tag in ci.yml with each bump.
+      playwright:
+        patterns:
+          - playwright
+      dev-tooling:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
