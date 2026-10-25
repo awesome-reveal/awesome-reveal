@@ -19,6 +19,9 @@ updates:
       # devEngines.runtime pins Node 24.
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+      # TypeScript 7 drops the JS API that vue-tsc, vite-plugin-dts and @astrojs/check use.
+      - dependency-name: typescript
+        versions: [">=7"]
     # A dependency joins the first group that matches it.
     groups:
       astro:
