@@ -91,7 +91,7 @@ The GitHub environment `npm` allows only the `main` branch. Add a branch there b
    ```
 
 3. Make sure that these packages have a `feat:`, `fix:` or `Release-As:` commit since the last release:
-   - `react-awesome-reveal`. Without one, `node-workspace` gives it a prerelease version (`5.0.1-next.N`), and it goes to `next`. A `fix:` commit that changes only this package and has a `Release-As: 5.0.0` footer gives 5.0.0 in the dry run.
+   - `react-awesome-reveal`. Without one, `node-workspace` gives it a prerelease version (`5.0.1-rc.N`), and it goes to `next`. A `fix:` commit that changes only this package and has a `Release-As: 5.0.0` footer gives 5.0.0 in the dry run.
    - core or one adapter. `linked-versions` then releases the full group.
 4. Do a dry run, and check that no version has a prerelease suffix. If a version has one, fix the cause from steps 1 to 3, push, and do the dry run again. Merge only when no version has a suffix.
 5. Merge the release PR. The `publish` job uses `latest`.
