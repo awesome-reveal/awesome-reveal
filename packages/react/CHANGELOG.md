@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.0.0](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/react@1.0.0-rc.0...@awesome-reveal/react@1.0.0) (2026-11-02)
+
+
+### Bug Fixes
+
+* leave prerelease mode and release 1.0.0 ([#359](https://github.com/awesome-reveal/awesome-reveal/issues/359)) ([a5efd73](https://github.com/awesome-reveal/awesome-reveal/commit/a5efd73bd0f9171672fd22925e39245545af2f71))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @awesome-reveal/core bumped to 1.0.0
+
 ## [1.0.0-rc.0](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/react@1.0.0-next.12...@awesome-reveal/react@1.0.0-rc.0) (2026-10-22)
 
 
