@@ -30,6 +30,12 @@ Do not use "Re-run all jobs". release-please then finds no pending release PR an
 - release-please adds a commit to the changelog of each package whose files it changes. It adds an empty commit to all packages.
 - `linked-versions` gives core and the adapters the highest version in the group. A group member with no commits gets the same version. `react-awesome-reveal` is not in the group.
 - A `Release-As: <version>` footer applies to each package that the commit changes. Put it only on a commit that changes only the packages that get that version.
+- A squash merge gives the commit a blank body, so it drops the `Release-As:` and `BREAKING CHANGE:` footers of the branch commits. release-please reads footers only from the commit body. Merge with the footer as the body, then check it with `git log -1 --format=%B`:
+
+  ```sh
+  gh pr merge <number> --squash --delete-branch --subject "<PR title> (#<number>)" --body "Release-As: 5.0.0"
+  ```
+
 - `release-as` in `release-please-config.json` sets the version of a package that has a `feat:`, `fix:` or other visible commit since its last release. It does nothing without such a commit. `linked-versions` still applies the highest version in the group. It stays active until you remove it, so remove it in the first PR after the release. Prefer a `Release-As:` footer.
 - `node-workspace` bumps `react-awesome-reveal` as a dependency update when only `@awesome-reveal/react` changes. That bump ignores `release-as`, and it keeps the prerelease suffix. A visible commit on the compat package prevents it.
 - Keep `last-release-sha`. It limits the commit walk for a package with no release yet, such as a new adapter.
