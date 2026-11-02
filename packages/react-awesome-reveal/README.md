@@ -3,7 +3,7 @@
 Reveal-on-scroll animations for React. Version 5 re-exports [`@awesome-reveal/react`](https://www.npmjs.com/package/@awesome-reveal/react), so v4 users can upgrade with no new package name.
 
 [![npm version](https://badgen.net/npm/v/react-awesome-reveal)](https://www.npmjs.com/package/react-awesome-reveal)
-[![License](https://badgen.net/npm/license/react-awesome-reveal)](https://github.com/awesome-reveal/awesome-reveal/blob/next/LICENSE)
+[![License](https://badgen.net/npm/license/react-awesome-reveal)](https://github.com/awesome-reveal/awesome-reveal/blob/main/LICENSE)
 
 ## Install
 
@@ -40,4 +40,4 @@ The package includes the `migrating-from-v4` skill, which helps a coding agent m
 
 ## License
 
-[MIT](https://github.com/awesome-reveal/awesome-reveal/blob/next/LICENSE)
+[MIT](https://github.com/awesome-reveal/awesome-reveal/blob/main/LICENSE)

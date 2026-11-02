@@ -3,9 +3,9 @@
 Reveal-on-scroll animations in plain JavaScript. Give a selector, and the elements fade and slide in when they enter the viewport.
 
 [![npm version](https://badgen.net/npm/v/@awesome-reveal/core)](https://www.npmjs.com/package/@awesome-reveal/core)
-[![License](https://badgen.net/npm/license/@awesome-reveal/core)](https://github.com/awesome-reveal/awesome-reveal/blob/next/LICENSE)
+[![License](https://badgen.net/npm/license/@awesome-reveal/core)](https://github.com/awesome-reveal/awesome-reveal/blob/main/LICENSE)
 
-<p align="center"><img src="https://raw.githubusercontent.com/awesome-reveal/awesome-reveal/next/.github/assets/demo.gif" alt="Elements fade, slide, scale, blur and rotate in as the page scrolls" width="640"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/awesome-reveal/awesome-reveal/main/.github/assets/demo.gif" alt="Elements fade, slide, scale, blur and rotate in as the page scrolls" width="640"></p>
 
 - **Small.** Less than 2 kB gzipped, with no dependencies and no stylesheet.
 - **Native.** Built on IntersectionObserver and the Web Animations API.
@@ -250,4 +250,4 @@ The package includes the `adding-reveal-animations` skill, which teaches a codin
 
 ## License
 
-[MIT](https://github.com/awesome-reveal/awesome-reveal/blob/next/LICENSE)
+[MIT](https://github.com/awesome-reveal/awesome-reveal/blob/main/LICENSE)
