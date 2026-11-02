@@ -5,12 +5,10 @@ Reveal-on-scroll animations for React. Version 5 re-exports [`@awesome-reveal/re
 [![npm version](https://badgen.net/npm/v/react-awesome-reveal)](https://www.npmjs.com/package/react-awesome-reveal)
 [![License](https://badgen.net/npm/license/react-awesome-reveal)](https://github.com/awesome-reveal/awesome-reveal/blob/next/LICENSE)
 
-> **Release candidate:** Version 5 is a release candidate. The API is frozen, so only fixes go in before the stable release. Tell us what works and what does not in [GitHub Discussions](https://github.com/awesome-reveal/awesome-reveal/discussions).
-
 ## Install
 
 ```sh
-npm install react-awesome-reveal@next
+npm install react-awesome-reveal
 ```
 
 For a new project, install `@awesome-reveal/react` instead. The two packages give the same API.
