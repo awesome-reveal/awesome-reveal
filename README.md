@@ -20,13 +20,13 @@ Reveal-on-scroll animations for React, Vue, Astro and plain JavaScript. Content 
 
 Install the package for your framework. Each README documents its API.
 
-| Framework  | Package                                                 | Version                                                                                                       |
-| ---------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| React      | [`@awesome-reveal/react`](packages/react)               | [![npm](https://badgen.net/npm/v/@awesome-reveal/react)](https://www.npmjs.com/package/@awesome-reveal/react) |
-| Vue        | [`@awesome-reveal/vue`](packages/vue)                   | [![npm](https://badgen.net/npm/v/@awesome-reveal/vue)](https://www.npmjs.com/package/@awesome-reveal/vue)     |
-| Astro      | [`@awesome-reveal/astro`](packages/astro)               | [![npm](https://badgen.net/npm/v/@awesome-reveal/astro)](https://www.npmjs.com/package/@awesome-reveal/astro) |
-| JavaScript | [`@awesome-reveal/core`](packages/core)                 | [![npm](https://badgen.net/npm/v/@awesome-reveal/core)](https://www.npmjs.com/package/@awesome-reveal/core)   |
-| React (v4) | [`react-awesome-reveal`](packages/react-awesome-reveal) | [![npm](https://badgen.net/npm/v/react-awesome-reveal)](https://www.npmjs.com/package/react-awesome-reveal)   |
+| Framework        | Package                                                 | Version                                                                                                       |
+| ---------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| React            | [`@awesome-reveal/react`](packages/react)               | [![npm](https://badgen.net/npm/v/@awesome-reveal/react)](https://www.npmjs.com/package/@awesome-reveal/react) |
+| Vue              | [`@awesome-reveal/vue`](packages/vue)                   | [![npm](https://badgen.net/npm/v/@awesome-reveal/vue)](https://www.npmjs.com/package/@awesome-reveal/vue)     |
+| Astro            | [`@awesome-reveal/astro`](packages/astro)               | [![npm](https://badgen.net/npm/v/@awesome-reveal/astro)](https://www.npmjs.com/package/@awesome-reveal/astro) |
+| JavaScript       | [`@awesome-reveal/core`](packages/core)                 | [![npm](https://badgen.net/npm/v/@awesome-reveal/core)](https://www.npmjs.com/package/@awesome-reveal/core)   |
+| React (v4 users) | [`react-awesome-reveal`](packages/react-awesome-reveal) | [![npm](https://badgen.net/npm/v/react-awesome-reveal)](https://www.npmjs.com/package/react-awesome-reveal)   |
 
 Version 5 of `react-awesome-reveal` re-exports `@awesome-reveal/react` for v4 users. To upgrade, read [Migrate from v4](packages/react#migrate-from-v4).
 
