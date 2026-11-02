@@ -3,9 +3,9 @@
 Reveal-on-scroll animations for React. Wrap content in `<Reveal>`, and it fades and slides in when it enters the viewport.
 
 [![npm version](https://badgen.net/npm/v/@awesome-reveal/react)](https://www.npmjs.com/package/@awesome-reveal/react)
-[![License](https://badgen.net/npm/license/@awesome-reveal/react)](https://github.com/awesome-reveal/awesome-reveal/blob/next/LICENSE)
+[![License](https://badgen.net/npm/license/@awesome-reveal/react)](https://github.com/awesome-reveal/awesome-reveal/blob/main/LICENSE)
 
-<p align="center"><img src="https://raw.githubusercontent.com/awesome-reveal/awesome-reveal/next/.github/assets/demo.gif" alt="Elements fade, slide, scale, blur and rotate in as the page scrolls" width="640"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/awesome-reveal/awesome-reveal/main/.github/assets/demo.gif" alt="Elements fade, slide, scale, blur and rotate in as the page scrolls" width="640"></p>
 
 - **Simple.** Two components, two hooks, and a few options.
 - **Native.** Built on IntersectionObserver and the Web Animations API, with no animation library.
@@ -294,4 +294,4 @@ The package includes two skills for coding agents. pnpm can link them into your 
 
 ## License
 
-[MIT](https://github.com/awesome-reveal/awesome-reveal/blob/next/LICENSE)
+[MIT](https://github.com/awesome-reveal/awesome-reveal/blob/main/LICENSE)

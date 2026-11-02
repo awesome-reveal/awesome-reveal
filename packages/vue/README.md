@@ -3,9 +3,9 @@
 Reveal-on-scroll animations for Vue. Wrap content in `<Reveal>`, or add `v-reveal` to an element, and it fades and slides in when it enters the viewport.
 
 [![npm version](https://badgen.net/npm/v/@awesome-reveal/vue)](https://www.npmjs.com/package/@awesome-reveal/vue)
-[![License](https://badgen.net/npm/license/@awesome-reveal/vue)](https://github.com/awesome-reveal/awesome-reveal/blob/next/LICENSE)
+[![License](https://badgen.net/npm/license/@awesome-reveal/vue)](https://github.com/awesome-reveal/awesome-reveal/blob/main/LICENSE)
 
-<p align="center"><img src="https://raw.githubusercontent.com/awesome-reveal/awesome-reveal/next/.github/assets/demo.gif" alt="Elements fade, slide, scale, blur and rotate in as the page scrolls" width="640"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/awesome-reveal/awesome-reveal/main/.github/assets/demo.gif" alt="Elements fade, slide, scale, blur and rotate in as the page scrolls" width="640"></p>
 
 - **Simple.** Two components, two directives, and a few options.
 - **Native.** Built on IntersectionObserver and the Web Animations API, with no animation library.
@@ -256,4 +256,4 @@ The package includes the `adding-reveal-animations` skill, which teaches a codin
 
 ## License
 
-[MIT](https://github.com/awesome-reveal/awesome-reveal/blob/next/LICENSE)
+[MIT](https://github.com/awesome-reveal/awesome-reveal/blob/main/LICENSE)

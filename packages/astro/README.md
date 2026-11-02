@@ -3,9 +3,9 @@
 Reveal-on-scroll animations for Astro. Wrap content in `<Reveal>`, and it fades and slides in when it enters the viewport. No framework, no hydration directive and no stylesheet import.
 
 [![npm version](https://badgen.net/npm/v/@awesome-reveal/astro)](https://www.npmjs.com/package/@awesome-reveal/astro)
-[![License](https://badgen.net/npm/license/@awesome-reveal/astro)](https://github.com/awesome-reveal/awesome-reveal/blob/next/LICENSE)
+[![License](https://badgen.net/npm/license/@awesome-reveal/astro)](https://github.com/awesome-reveal/awesome-reveal/blob/main/LICENSE)
 
-<p align="center"><img src="https://raw.githubusercontent.com/awesome-reveal/awesome-reveal/next/.github/assets/demo.gif" alt="Elements fade, slide, scale, blur and rotate in as the page scrolls" width="640"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/awesome-reveal/awesome-reveal/main/.github/assets/demo.gif" alt="Elements fade, slide, scale, blur and rotate in as the page scrolls" width="640"></p>
 
 - **Simple.** Two components and a few options.
 - **Native.** A small custom element, built on IntersectionObserver and the Web Animations API.
@@ -269,4 +269,4 @@ The package includes the `adding-reveal-animations` skill, which teaches a codin
 
 ## License
 
-[MIT](https://github.com/awesome-reveal/awesome-reveal/blob/next/LICENSE)
+[MIT](https://github.com/awesome-reveal/awesome-reveal/blob/main/LICENSE)
