@@ -30,7 +30,7 @@ The pre-commit hook runs oxlint and oxfmt on the staged files. CI runs the tests
 
 ## Rules
 
-- Open PRs against `next`. `main` keeps the v4 line until 1.0 ships.
+- Open PRs against `main`.
 - Use Conventional Commits. release-please writes the changelog from them, so mark each breaking change with `!` and a `BREAKING CHANGE:` footer.
 - All packages share one version, through `linked-versions` in `release-please-config.json`. Each adapter depends on `@awesome-reveal/core` with `workspace:*`, so it publishes an exact version. The `/adapter` entry of core is a private contract, not semver API. The `data-awesome-reveal` attributes are public API: the READMEs document them, and users forward them.
 - `react-awesome-reveal` is the exception. It continues the v4 version line, from 5.0.0. Do not add it to `linked-versions`: release-please gives all linked packages the highest version.

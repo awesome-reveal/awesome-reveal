@@ -5,7 +5,7 @@ description: Releases the awesome-reveal packages with release-please and npm tr
 
 # Release the packages
 
-A push to `main` or `next` runs `.github/workflows/release.yml`. The `release-please` job opens or updates the release PR, "chore: release <branch>". When the release PR merges, the job creates the tags and the GitHub releases, and the `publish` job publishes to npm with OIDC. The `publish` job gives each released package the `latest` dist-tag. A prerelease gets `next` instead when the package already has a stable version on `latest`. So a package with no stable version gets its prereleases on `latest`, and a plain install gets them.
+A push to `main` runs `.github/workflows/release.yml`. The `release-please` job opens or updates the release PR, "chore: release <branch>". When the release PR merges, the job creates the tags and the GitHub releases, and the `publish` job publishes to npm with OIDC. The `publish` job gives each released package the `latest` dist-tag. A prerelease gets `next` instead when the package already has a stable version on `latest`. So a package with no stable version gets its prereleases on `latest`, and a plain install gets them.
 
 Do not run `npm publish`, `npm trust` or `npm dist-tag` yourself. The agent shell cannot do the npm web 2FA, so these commands fail with `EOTP`. Give the command to the user, with `--otp=<code>`, to run as `! <command>`.
 
@@ -79,7 +79,7 @@ npm can add a trusted publisher only to a package that exists.
    - The package had fewer than 300 downloads in the last week.
    - The package has one maintainer.
 
-The GitHub environment `npm` allows only the `main` and `next` branches. Add a branch there before you release from it.
+The GitHub environment `npm` allows only the `main` branch. Add a branch there before you release from it.
 
 ## Leave prerelease mode
 
@@ -95,17 +95,4 @@ The GitHub environment `npm` allows only the `main` and `next` branches. Add a b
    - core or one adapter. `linked-versions` then releases the full group.
 4. Do a dry run, and check that no version has a prerelease suffix. If a version has one, fix the cause from steps 1 to 3, push, and do the dry run again. Merge only when no version has a suffix.
 5. Merge the release PR. The `publish` job uses `latest`.
-6. Remove `release-as` in the next PR.
-
-## Move `main` to a stable release
-
-Do this after the `publish` job of a stable release from `next` succeeds. A failed publish can then still be re-run from `next`.
-
-`main` requires linear history. A merge commit is rejected, and a squash or rebase puts the release commits and tags outside the history of `main`, so release-please finds no release there. Move `main` to the SHA of `next` instead:
-
-1. Fetch, and check whether `main` is an ancestor of `next`: `git merge-base --is-ancestor origin/main origin/next`.
-2. If it is, fast-forward: `git push origin origin/next:main`. No force is necessary.
-3. If it is not, `main` has commits that `next` lacks. List them with `git log origin/next..origin/main`. Continue only when you do not need them, or when you first cherry-pick them onto `next` in a PR and re-run the release. Then reset: `git push --force-with-lease=main:<old main SHA> origin origin/next:main`. If GitHub rejects the push, allow force pushes on `main` in its branch protection, push, and disable the setting again.
-4. Check that the release workflow on `main` finds no release to make.
-
-Make no direct commits to `main`. Hotfixes go to `next` first, so that `main` stays an ancestor of `next` and step 2 works.
+6. Remove `release-as` in the first PR after the release.

@@ -88,7 +88,7 @@ The packages include agent skills that teach a coding agent the API. pnpm can li
 
 ## Contributing
 
-Open pull requests against the `next` branch. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) to set up the workspace. [`AGENTS.md`](AGENTS.md) lists the commands for the build, the tests and the lint.
+Open pull requests against the `main` branch. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) to set up the workspace. [`AGENTS.md`](AGENTS.md) lists the commands for the build, the tests and the lint.
 
 ## Support
 

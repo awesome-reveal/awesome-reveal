@@ -4,7 +4,7 @@ Thanks for your help with awesome-reveal.
 
 - Report a bug with the issue form.
 - Use [Discussions](https://github.com/awesome-reveal/awesome-reveal/discussions) to ask a question or to suggest a feature.
-- Open pull requests against the `next` branch.
+- Open pull requests against the `main` branch.
 - Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for the PR title. release-please writes the changelog from it.
 
 ## Set up
