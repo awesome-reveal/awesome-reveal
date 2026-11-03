@@ -2,7 +2,7 @@
 
 Reveal-on-scroll animations for React, Vue, Astro and plain JavaScript. Content fades and slides in when it enters the viewport. Visit [awesome-reveal.dev](https://awesome-reveal.dev).
 
-[![CI](https://github.com/awesome-reveal/awesome-reveal/actions/workflows/ci.yml/badge.svg?branch=next)](https://github.com/awesome-reveal/awesome-reveal/actions/workflows/ci.yml)
+[![CI](https://github.com/awesome-reveal/awesome-reveal/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/awesome-reveal/awesome-reveal/actions/workflows/ci.yml)
 [![npm version](https://badgen.net/npm/v/@awesome-reveal/core)](https://www.npmjs.com/package/@awesome-reveal/core)
 [![npm downloads](https://badgen.net/npm/dt/@awesome-reveal/core)](https://www.npmjs.com/package/@awesome-reveal/core)
 [![GitHub stars](https://badgen.net/github/stars/awesome-reveal/awesome-reveal)](https://github.com/awesome-reveal/awesome-reveal/stargazers)
@@ -88,7 +88,7 @@ The packages include agent skills that teach a coding agent the API. pnpm can li
 
 ## Contributing
 
-Open pull requests against the `next` branch. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) to set up the workspace. [`AGENTS.md`](AGENTS.md) lists the commands for the build, the tests and the lint.
+Open pull requests against the `main` branch. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) to set up the workspace. [`AGENTS.md`](AGENTS.md) lists the commands for the build, the tests and the lint.
 
 ## Support
 
