@@ -1,5 +1,19 @@
 # react-awesome-reveal
 
+## [5.0.0](https://github.com/awesome-reveal/awesome-reveal/compare/react-awesome-reveal@5.0.0-rc.0...react-awesome-reveal@5.0.0) (2026-11-02)
+
+
+### Bug Fixes
+
+* release version 5 of react-awesome-reveal as stable ([#358](https://github.com/awesome-reveal/awesome-reveal/issues/358)) ([f236dff](https://github.com/awesome-reveal/awesome-reveal/commit/f236dffdfa8ce729528da68412beb32c201ac740))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @awesome-reveal/react bumped to 1.0.0
+
 ## [5.0.0-rc.0](https://github.com/awesome-reveal/awesome-reveal/compare/react-awesome-reveal@5.0.0-next.12...react-awesome-reveal@5.0.0-rc.0) (2026-10-22)
 
 
