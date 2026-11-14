@@ -18,5 +18,5 @@ catalog:
   vite: ^8.3.5
   vitest-browser-react: ^2.3.0
   vitest-browser-vue: ^3.1.0
-  vue: ^3.5.44
-  vue-tsc: ^3.3.13
+  vue: ^3.5.45
+  vue-tsc: ^3.3.14
