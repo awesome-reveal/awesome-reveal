@@ -33,7 +33,7 @@ jobs:
           persist-credentials: false
 
       - name: Install pnpm, Node.js and the dependencies
-        uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
+        uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
         with:
           cache: true
           require-lockfile: true
@@ -102,7 +102,7 @@ jobs:
           persist-credentials: false
 
       - name: Install pnpm, Node.js and the dependencies
-        uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
+        uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
         with:
           cache: true
           # This job adds packages to the store, so each run would save a new cache entry.
@@ -147,7 +147,7 @@ jobs:
           persist-credentials: false
 
       - name: Install pnpm, Node.js and the dependencies
-        uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
+        uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
         with:
           cache: true
           require-lockfile: true
@@ -207,7 +207,7 @@ jobs:
           persist-credentials: false
 
       - name: Install pnpm, Node.js and the dependencies
-        uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
+        uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
         with:
           cache: true
           # This job adds packages to the store, so each run would save a new cache entry.
@@ -242,7 +242,7 @@ jobs:
           persist-credentials: false
 
       - name: Install pnpm, Node.js and the dependencies
-        uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
+        uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
         with:
           cache: true
           require-lockfile: true
