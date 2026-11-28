@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/vue@1.0.0...@awesome-reveal/vue@1.0.1) (2026-11-28)
+
+
+### Bug Fixes
+
+* **vue:** reject as tags whose children cannot hydrate ([#392](https://github.com/awesome-reveal/awesome-reveal/issues/392)) ([07b9d88](https://github.com/awesome-reveal/awesome-reveal/commit/07b9d8872d2cbda60735166ed091f039f709f280))
+
 ## [1.0.0](https://github.com/awesome-reveal/awesome-reveal/compare/@awesome-reveal/vue@1.0.0-rc.0...@awesome-reveal/vue@1.0.0) (2026-11-02)
 
 
