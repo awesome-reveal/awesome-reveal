@@ -38,10 +38,10 @@ type UnhydratableTag =
 export type RevealProps = RevealOptions &
   Attributes & {
     /**
-     * The tag of the rendered element.
+     * The tag of the rendered element: an HTML tag that can contain the children, or a custom element.
      * @default "div"
      */
-    as?: Exclude<keyof HTMLElementTagNameMap, VoidTag | UnhydratableTag>;
+    as?: Exclude<keyof HTMLElementTagNameMap, VoidTag | UnhydratableTag> | `${string}-${string}`;
     children?: Snippet<[{ revealed: boolean }]>;
   };
 

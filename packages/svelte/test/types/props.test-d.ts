@@ -38,6 +38,11 @@ describe("RevealProps", () => {
     expectTypeOf<{ as: "tbody" }>().toExtend<CascadeProps>();
   });
 
+  it("accepts a custom element", () => {
+    expectTypeOf<{ as: "my-card" }>().toExtend<RevealProps>();
+    expectTypeOf<{ as: "my-list" }>().toExtend<CascadeProps>();
+  });
+
   it("gives interval to the cascade", () => {
     expectTypeOf<{ interval: 100 }>().toExtend<CascadeProps>();
   });
