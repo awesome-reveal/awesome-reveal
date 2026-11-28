@@ -169,7 +169,7 @@ The promise rejects when the entrance stops early, for example after `when: fals
 
 | Option                       | Type                 | Default    | Description                                                     |
 | ---------------------------- | -------------------- | ---------- | --------------------------------------------------------------- |
-| `as` (components only)       | `string`             | `"div"`    | The rendered tag                                                |
+| `as` (components only)       | HTML tag name        | `"div"`    | The rendered tag                                                |
 | `from`                       | `Side \| StartState` | `"bottom"` | The side or the start state of the entrance                     |
 | `keyframes`                  | `Keyframe[]`         | —          | Native keyframes. You cannot use them together with `from`      |
 | `duration`                   | `number`             | `600`      | The duration of the entrance, in milliseconds                   |
@@ -179,7 +179,7 @@ The promise rejects when the entrance stops early, for example after `when: fals
 | `onReveal` (directives only) | `(element) => void`  | —          | Runs one time for each reveal, when it starts                   |
 | `interval` (cascade only)    | `number`             | `80`       | The time between the entrances of two children, in milliseconds |
 
-The components emit `reveal` with the element, give `revealed` to the default slot, and pass the other attributes to the rendered element.
+The components emit `reveal` with the element, give `revealed` to the default slot, and pass the other attributes to the rendered element. `as` accepts a custom element, such as `my-card`. It accepts no void tag, such as `img`, because the components render a slot. It also accepts no tag whose children cannot hydrate, such as `textarea`, `title` or `template`.
 
 ### Behavior
 
