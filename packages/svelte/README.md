@@ -171,7 +171,7 @@ The promise rejects when the entrance stops early, for example after `when: fals
 | `onReveal`                | `(element) => void`  | —          | Runs one time for each reveal, when it starts                   |
 | `interval` (cascade only) | `number`             | `80`       | The time between the entrances of two children, in milliseconds |
 
-The components give `revealed` to the `children` snippet, and pass the other props to the rendered element as attributes. Their types accept the global HTML attributes, such as `id`, `class` and `aria-*`, and the attachments that you give to the component. `as` accepts no void tag, such as `img`, because the components render children. It also accepts no tag whose children cannot hydrate, such as `textarea`, `title` or `template`. The attachments take a function that returns the options.
+The components give `revealed` to the `children` snippet, and pass the other props to the rendered element as attributes. Their types accept the global HTML attributes, such as `id`, `class` and `aria-*`, and the attachments that you give to the component. `as` accepts a custom element, such as `my-card`. It accepts no void tag, such as `img`, because the components render children. It also accepts no tag whose children cannot hydrate, such as `textarea`, `title` or `template`. The attachments take a function that returns the options.
 
 ### Behavior
 
