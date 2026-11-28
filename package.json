@@ -18,7 +18,7 @@
     "@commitlint/cli": "21.2.4",
     "@commitlint/config-conventional": "21.2.4",
     "@sveltejs/vite-plugin-svelte": "^7.3.2",
-    "@types/node": "^24.19.2",
+    "@types/node": "^26.6.11",
     "@vitejs/plugin-vue": "^6.0.11",
     "@vitest/browser-playwright": "^5.1.1",
     "@vitest/coverage-istanbul": "^5.1.1",
@@ -36,12 +36,12 @@
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "12.15.0",
+      "version": "12.23.0",
       "onFail": "download"
     },
     "runtime": {
       "name": "node",
-      "version": "24.22.1",
+      "version": "26.13.1",
       "onFail": "download"
     }
   }
