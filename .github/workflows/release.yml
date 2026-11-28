@@ -19,22 +19,30 @@ jobs:
     name: Release Please
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
+    # release-please uses the App token, not GITHUB_TOKEN.
+    permissions: {}
     outputs:
       releases_created: ${{ steps.release.outputs.releases_created }}
       paths_released: ${{ steps.release.outputs.paths_released }}
       sha: ${{ steps.release-commit.outputs.sha }}
     steps:
+      # GitHub verifies the API commits of an App, which main requires, and the release PR of an App starts CI.
+      - name: Create the App token
+        id: app-token
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-issues: write
+          permission-pull-requests: write
+
       - name: Release Please
         id: release
         uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
           target-branch: ${{ github.ref_name }}
-          # A PR that GITHUB_TOKEN opens starts no workflows. A personal token starts CI on the release PR.
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          token: ${{ steps.app-token.outputs.token }}
 
       # A queued run can release a commit other than github.sha. One release PR releases all packages from one commit.
       - name: Find the release commit
@@ -72,7 +80,7 @@ jobs:
         with:
           require-lockfile: true
 
-      # The release PR can come from a token that starts no CI, so the publish job checks the packages itself.
+      # An admin can merge the release PR before its checks pass, so the publish job checks the packages itself.
       - name: Test package
         run: pnpm test:package
 
