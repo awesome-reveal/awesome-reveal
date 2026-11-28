@@ -63,7 +63,7 @@ jobs:
           }
           EOF
 
-  # The main job tests the catalog version of each framework. This job tests the older majors in the peer ranges.
+  # The main job tests the catalog version of each framework. This job tests the newest version of each older major in a peer range, or the lowest version of a range with one major.
   framework:
     name: Test (${{ matrix.name }})
     runs-on: ubuntu-latest

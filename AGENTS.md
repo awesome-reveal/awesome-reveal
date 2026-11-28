@@ -9,7 +9,7 @@ Reveal-on-scroll animations for many frameworks, built on IntersectionObserver a
 - `packages/react-awesome-reveal`: the compat package for v4 users. It re-exports `@awesome-reveal/react`.
 - `packages/test-utils`: private test helpers, pass-through spies, setup files and checks for the adapters.
 - `packages/*/skills`: agent skills for the users of each package. pnpm links them into consumer projects.
-- `examples/react`, `examples/vue`, `examples/svelte`, `examples/astro`, `examples/next`: apps for manual checks (`pnpm --filter example-react dev`). The examples import the `dist` output of the packages, so run `pnpm build` first.
+- `examples/react`, `examples/vue`, `examples/svelte`, `examples/astro`, `examples/next`: apps for manual checks (`pnpm --filter example-react dev`). The examples import the `dist` output of the packages, so run `pnpm build` first. The Astro example uses the sources, through the `tsconfig.base.json` paths.
 - `vite.lib.config.ts`: the library build that all packages share.
 - `vitest.config.ts`: one Vitest project for each package and test kind, named `<package>:<kind>`.
 
