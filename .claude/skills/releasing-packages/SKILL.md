@@ -91,8 +91,8 @@ The GitHub environment `npm` allows only the `main` branch. Add a branch there b
 Set these options on the package in `release-please-config.json`:
 
 ```json
-"packages/svelte": {
-  "component": "@awesome-reveal/svelte",
+"packages/<framework>": {
+  "component": "@awesome-reveal/<framework>",
   "prerelease": true,
   "versioning": "prerelease",
   "prerelease-type": "rc",
@@ -108,7 +108,7 @@ Each later release increments the number: `1.0.0-rc.1`, then `1.0.0-rc.2`, for e
 2. In the same PR, set `release-as` on the package to its stable version. A `Release-As:` footer does not work here, because the commit changes no package files:
 
    ```json
-   "packages/svelte": { "component": "@awesome-reveal/svelte", "release-as": "1.0.0" }
+   "packages/<framework>": { "component": "@awesome-reveal/<framework>", "release-as": "1.0.0" }
    ```
 
 3. Make sure that the package has a `feat:` or `fix:` commit since its last release. Also make sure that each package that depends on it has one. Without one, `node-workspace` gives the dependent a prerelease version, and it goes to `next`.
