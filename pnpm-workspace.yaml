@@ -18,7 +18,7 @@ catalog:
   svelte: ^5.59.2
   svelte-check: ^4.7.8
   typescript: ^6.0.3
-  vite: ^8.3.5
+  vite: ^8.3.8
   vitest-browser-react: ^2.3.0
   vitest-browser-svelte: ^3.1.0
   vitest-browser-vue: ^3.1.0
