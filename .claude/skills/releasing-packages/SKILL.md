@@ -95,12 +95,12 @@ Set these options on the package in `release-please-config.json`:
   "component": "@awesome-reveal/svelte",
   "prerelease": true,
   "versioning": "prerelease",
-  "prerelease-type": "next",
-  "release-as": "1.0.0-next.0"
+  "prerelease-type": "rc",
+  "release-as": "1.0.0-rc.0"
 }
 ```
 
-Each later release increments the number: `1.0.0-next.1`, then `1.0.0-next.2`, for each commit type. Without `release-as`, the first version has no number, such as `1.1.0-next`. The `publish` job puts the prereleases of a package with no stable version on `latest`.
+Each later release increments the number: `1.0.0-rc.1`, then `1.0.0-rc.2`, for each commit type. Without `release-as`, the first version has no number, such as `1.1.0-rc`. The `publish` job puts the prereleases of a package with no stable version on `latest`.
 
 ## Leave prerelease mode
 
