@@ -12,7 +12,7 @@ Reveal-on-scroll animations in plain JavaScript. Give a selector, and the elemen
 - **Accessible.** Obeys the reduced-motion preference, and shows waiting content on focus and in print.
 - **CSP-friendly.** Writes no inline styles, so it works with a strict Content Security Policy.
 
-Do you use React, Vue or Astro? Use [`@awesome-reveal/react`](https://www.npmjs.com/package/@awesome-reveal/react), [`@awesome-reveal/vue`](https://www.npmjs.com/package/@awesome-reveal/vue) or [`@awesome-reveal/astro`](https://www.npmjs.com/package/@awesome-reveal/astro). They also hide server-rendered content until it reveals.
+Do you use React, Vue, Svelte or Astro? Use [`@awesome-reveal/react`](https://www.npmjs.com/package/@awesome-reveal/react), [`@awesome-reveal/vue`](https://www.npmjs.com/package/@awesome-reveal/vue), [`@awesome-reveal/svelte`](https://www.npmjs.com/package/@awesome-reveal/svelte) or [`@awesome-reveal/astro`](https://www.npmjs.com/package/@awesome-reveal/astro). They also hide server-rendered content until it reveals.
 
 ## Install
 
@@ -177,7 +177,7 @@ The package also exports the types `Side`, `StartState`, `RevealOptions`, `Casca
 
 ## Server-side rendering
 
-You can import the package on a server, but call `reveal()` and `cascade()` only in the browser. Core does not hide content before your script runs, so server-rendered content can show, then animate. The React, Vue and Astro packages hide it with a stylesheet.
+You can import the package on a server, but call `reveal()` and `cascade()` only in the browser. Core does not hide content before your script runs, so server-rendered content can show, then animate. The React, Vue, Svelte and Astro packages hide it with a stylesheet.
 
 ## Good to know
 
