@@ -32,8 +32,9 @@ The pre-commit hook runs oxlint and oxfmt on the staged files. CI runs the tests
 
 - Open PRs against `main`.
 - Use Conventional Commits. release-please writes the changelog from them, so mark each breaking change with `!` and a `BREAKING CHANGE:` footer.
-- All packages share one version, through `linked-versions` in `release-please-config.json`. Each adapter depends on `@awesome-reveal/core` with `workspace:*`, so it publishes an exact version. The `/adapter` entry of core is a private contract, not semver API. The `data-awesome-reveal` attributes are public API: the READMEs document them, and users forward them.
-- `react-awesome-reveal` is the exception. It continues the v4 version line, from 5.0.0. Do not add it to `linked-versions`: release-please gives all linked packages the highest version.
+- Each package has its own version, so a change releases only the packages that it changes. `react-awesome-reveal` continues the v4 version line, from 5.0.0.
+- Each adapter depends on `@awesome-reveal/core` with `workspace:*`, so it publishes an exact version. The `/adapter` entry of core is a private contract, not semver API. The `data-awesome-reveal` attributes are public API: the READMEs document them, and users forward them.
+- When core releases, release-please gives each adapter only a patch release. The adapters re-export the core options and types, so a breaking change to them breaks the adapters too. Change a file of each affected adapter in the same commit, so that its `!` applies to the adapter.
 - Core imports no framework. The reveal options and all the behavior live in core, and an adapter only binds them to its framework, so that all adapters behave the same. The contract suite in `packages/test-utils` checks it.
 - The packages are ESM-only. `"sideEffects"` lists only `*.css` when the package exports `reveal.css` or a JS module imports it, or is `false`. Astro is `false`, because its CSS import is in `Host.astro`, which Astro compiles. The build keeps one file per module, so bundlers drop the modules that a consumer does not import.
 - Tests and type checks use the sources of other workspace packages, through the `tsconfig.base.json` paths and the `vitest.config.ts` alias. No build is necessary first.

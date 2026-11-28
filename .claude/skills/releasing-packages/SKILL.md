@@ -1,6 +1,6 @@
 ---
 name: releasing-packages
-description: Releases the awesome-reveal packages with release-please and npm trusted publishing. Use when you merge a release PR, fix a failed publish, set a version, publish a new package for the first time, do a release-please dry run, or leave prerelease mode for a stable release.
+description: Releases the awesome-reveal packages with release-please and npm trusted publishing. Use when you merge a release PR, fix a failed publish, set a version, publish a new package for the first time, do a release-please dry run, or start or leave prerelease mode.
 ---
 
 # Release the packages
@@ -28,7 +28,7 @@ Do not use "Re-run all jobs". release-please then finds no pending release PR an
 
 - release-please writes the changelog from Conventional Commits. `!` alone writes the subject as the breaking-change note. A `BREAKING CHANGE:` footer writes its text instead.
 - release-please adds a commit to the changelog of each package whose files it changes. It adds an empty commit to all packages.
-- `linked-versions` gives core and the adapters the highest version in the group. A group member with no commits gets the same version. `react-awesome-reveal` is not in the group.
+- Each package has its own version. `node-workspace` gives a patch release to each package that depends on a released package: each adapter when core releases, and `react-awesome-reveal` when `@awesome-reveal/react` releases. That bump ignores `release-as`, and it keeps the prerelease suffix. A visible commit on the dependent package prevents it.
 - A `Release-As: <version>` footer applies to each package that the commit changes. Put it only on a commit that changes only the packages that get that version.
 - A squash merge gives the commit a blank body, so it drops the `Release-As:` and `BREAKING CHANGE:` footers of the branch commits. release-please reads footers only from the commit body. Merge with the footer as the body, then check it with `git log -1 --format=%B`:
 
@@ -36,8 +36,7 @@ Do not use "Re-run all jobs". release-please then finds no pending release PR an
   gh pr merge <number> --squash --delete-branch --subject "<PR title> (#<number>)" --body "Release-As: 5.0.0"
   ```
 
-- `release-as` in `release-please-config.json` sets the version of a package that has a `feat:`, `fix:` or other visible commit since its last release. It does nothing without such a commit. `linked-versions` still applies the highest version in the group. It stays active until you remove it, so remove it in the first PR after the release. Prefer a `Release-As:` footer.
-- `node-workspace` bumps `react-awesome-reveal` as a dependency update when only `@awesome-reveal/react` changes. That bump ignores `release-as`, and it keeps the prerelease suffix. A visible commit on the compat package prevents it.
+- `release-as` in `release-please-config.json` sets the version of a package that has a `feat:`, `fix:` or other visible commit since its last release. It does nothing without such a commit. It stays active until you remove it, so remove it in the first PR after the release. Prefer a `Release-As:` footer.
 - Keep `last-release-sha`. It limits the commit walk for a package with no release yet, such as a new adapter.
 
 ## Do a dry run
@@ -87,18 +86,32 @@ npm can add a trusted publisher only to a package that exists.
 
 The GitHub environment `npm` allows only the `main` branch. Add a branch there before you release from it.
 
+## Start prerelease mode
+
+Set these options on the package in `release-please-config.json`:
+
+```json
+"packages/svelte": {
+  "component": "@awesome-reveal/svelte",
+  "prerelease": true,
+  "versioning": "prerelease",
+  "prerelease-type": "next",
+  "release-as": "1.0.0-next.0"
+}
+```
+
+Each later release increments the number: `1.0.0-next.1`, then `1.0.0-next.2`, for each commit type. Without `release-as`, the first version has no number, such as `1.1.0-next`. The `publish` job puts the prereleases of a package with no stable version on `latest`.
+
 ## Leave prerelease mode
 
-1. Remove `versioning`, `prerelease` and `prerelease-type` from `release-please-config.json`.
-2. In the same PR, set `release-as` on each package to its stable version. A `Release-As:` footer does not work here, because the commit changes no package files:
+1. Remove `versioning`, `prerelease` and `prerelease-type` from the package in `release-please-config.json`.
+2. In the same PR, set `release-as` on the package to its stable version. A `Release-As:` footer does not work here, because the commit changes no package files:
 
    ```json
-   "packages/core": { "component": "@awesome-reveal/core", "release-as": "1.0.0" }
+   "packages/svelte": { "component": "@awesome-reveal/svelte", "release-as": "1.0.0" }
    ```
 
-3. Make sure that these packages have a `feat:`, `fix:` or `Release-As:` commit since the last release:
-   - `react-awesome-reveal`. Without one, `node-workspace` gives it a prerelease version (`5.0.1-rc.N`), and it goes to `next`. A `fix:` commit that changes only this package and has a `Release-As: 5.0.0` footer gives 5.0.0 in the dry run.
-   - core or one adapter. `linked-versions` then releases the full group.
+3. Make sure that the package has a `feat:` or `fix:` commit since its last release. Also make sure that each package that depends on it has one. Without one, `node-workspace` gives the dependent a prerelease version, and it goes to `next`.
 4. Do a dry run, and check that no version has a prerelease suffix. If a version has one, fix the cause from steps 1 to 3, push, and do the dry run again. Merge only when no version has a suffix.
 5. Merge the release PR. The `publish` job uses `latest`.
 6. Remove `release-as` in the first PR after the release.

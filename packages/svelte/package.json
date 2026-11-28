@@ -1,6 +1,6 @@
 {
   "name": "@awesome-reveal/svelte",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Reveal-on-scroll animations for Svelte, built on the Web Animations API and IntersectionObserver.",
   "keywords": [
     "animate-on-scroll",

@@ -250,9 +250,9 @@ The package writes no `style` attribute, no inline script and no CSS at runtime.
 </details>
 
 <details>
-<summary>React, Vue and Svelte islands</summary>
+<summary>React and Vue islands</summary>
 
-To reveal content inside a React, Vue or Svelte island, use [`@awesome-reveal/react`](https://www.npmjs.com/package/@awesome-reveal/react), [`@awesome-reveal/vue`](https://www.npmjs.com/package/@awesome-reveal/vue) or [`@awesome-reveal/svelte`](https://www.npmjs.com/package/@awesome-reveal/svelte) in the island. For a React or Vue island, also import its `reveal.css` in the page. Hydrate the island eagerly, for example with `client:load`.
+To reveal content inside a React or Vue island, use [`@awesome-reveal/react`](https://www.npmjs.com/package/@awesome-reveal/react) or [`@awesome-reveal/vue`](https://www.npmjs.com/package/@awesome-reveal/vue) in the island, and import its `reveal.css` in the page. Hydrate the island eagerly, for example with `client:load`.
 
 </details>
 
