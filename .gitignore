@@ -7,4 +7,5 @@ coverage
 __traces__
 .astro
 .next
+.svelte-kit
 next-env.d.ts

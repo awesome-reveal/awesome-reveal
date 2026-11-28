@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "types": ["node", "vitest/globals", "vitest/browser", "vite/client", "svelte"]
+  },
+  "include": ["../src", ".", "**/*.svelte"],
+  "exclude": ["package"]
+}

@@ -1,0 +1,77 @@
+---
+name: adding-reveal-animations
+description: Adds reveal-on-scroll animations with the Reveal and Cascade components and the reveal and cascade attachments of @awesome-reveal/svelte, and native Web Animations keyframes. Use when you animate Svelte elements that enter the viewport.
+license: MIT
+compatibility: Requires @awesome-reveal/svelte and Svelte 5.46.4 or later.
+---
+
+# Add reveal animations
+
+Use the `Reveal` component, or the `reveal` attachment on an element that you render. `Cascade` and the `cascade` attachment reveal the children of an element in sequence.
+
+Use `Reveal` and `Cascade` for server-rendered content, such as a SvelteKit page with SSR. They render the hidden state on the server. Attachments run only in the browser, so server-rendered content with an attachment shows until hydration, then hides until it reveals. Use the attachments for client-only content, such as content that a user action renders, or a page with `ssr = false`.
+
+Give the attachment options as a function: `{@attach reveal(() => ({ from: "left", when: open }))}`. The attachment reads the function in an effect, so a change of `open` updates the options and keeps the reveal. `reveal()` with no argument uses the defaults.
+
+The package loads its stylesheet, which hides the content until it reveals. Do not import it: the package modules import it on the server too, so SvelteKit and Astro add it to the server HTML.
+
+Hydrate reveal content eagerly, for example with `client:load` in an Astro island, not `client:visible`. The stylesheet hides the server markup for at most 5 seconds. If the script attaches later, the content shows, then hides again until it reveals.
+
+The stylesheet replaces a CSS `animation` of the hidden element or of a cascade child until the reveal, so put your own animation on an inner element.
+
+```svelte
+<script lang="ts">
+  import { Cascade, Reveal, reveal } from "@awesome-reveal/svelte";
+</script>
+
+<Reveal from="left">Hello</Reveal>
+<p {@attach reveal(() => ({ from: { opacity: 0 }, delay: 100 }))}>Fade only</p>
+<Cascade as="ul" interval={120}>
+  <li>Fast</li>
+  <li>Small</li>
+</Cascade>
+```
+
+An attachment with fixed options can live in a module and serve many elements:
+
+```ts
+import { reveal } from "@awesome-reveal/svelte";
+
+export const fadeIn = reveal(() => ({ from: { opacity: 0 }, duration: 400 }));
+```
+
+Set `from` to `"top"`, `"right"`, `"bottom"` or `"left"` for an entrance that starts transparent and 24px away on that side. The defaults are `from: "bottom"`, `duration: 600` (milliseconds), `delay: 0` (milliseconds) and `threshold: 0`. Without `when`, the entrance plays one time.
+
+Use `delay` to start separate elements at different times. During the delay, the element stays in its start state. Keep `delay` below about 300 ms. A long delay makes content appear late when the user scrolls quickly.
+
+An element that is too large to reach `threshold` in the viewport reveals when it enters. In a scroll container that is too small to show `threshold` of it, it reveals when it leaves the visible area. So keep `threshold` low for tall elements. Focus in a waiting element shows it at once, with no entrance, except with `when: false`.
+
+A `from` object is the complete start state: `{ opacity: 0 }` is a pure fade, and `{ scale: 0.9 }` adds no fade and no movement. A number is in pixels for `x`, `y` and `blur`, and in degrees for `rotate`. A string can contain a CSS value with its unit. The entrance animates only the properties that the start state sets, and ends at their neutral values: no offset, no rotation, no blur, a scale of 1 and an opacity of 1. The element's own `transform` stays in effect. The element's own values of the animated properties do not apply until the entrance ends, so put them on an inner element when they must apply during the entrance. Prefer a start state without `blur` on pages that must stay smooth: with a blur, Chromium runs the full entrance on the main thread.
+
+For a custom animation, give native `Keyframe[]` in `keyframes`. Do not use `from` and `keyframes` together. Put the easing of each segment in its keyframe. End at the resting style of the element, because the animation does not keep its last keyframe. Give explicit values to the first keyframe, because WebKit can take an implicit start value from an earlier animation. Animate `opacity`, `transform`, `translate`, `scale` or `rotate`, because the browser can run them on the compositor. Do not animate layout properties such as `width`, `height`, `top`, `left` or `margin`, because they cause a layout and a paint on each frame. Do not add `will-change` for the entrance, because the browser treats an animated property as if `will-change` already names it. Leave reduced motion to the package: it shows the content with no entrance when the user prefers reduced motion.
+
+A cascade schedules all children when its container enters the viewport, so the last children of a long list start late or out of view. For a long list, a virtualized list, or a grid that is taller than the viewport, use `Reveal` or the `reveal` attachment on each item. For a short group, use `Cascade`, or the `cascade` attachment on an element that you render. It animates the direct element children in sequence, `interval` milliseconds apart (default 80). The first child starts after `delay`, so `delay` moves the whole sequence. It takes the same options as `Reveal`, and also `interval`. Do not install `@awesome-reveal/core` for a cascade.
+
+The cascade reads the children when the container reveals, so a child that you add later shows with no animation. To cascade words or sentences, wrap each one in an element in the markup. Give inline children `display: inline-block`, because a transform does not apply to an inline box. Do not put a `Reveal` directly inside a `Cascade`, because the two entrances combine. Do not collect deeper descendants to animate them.
+
+Use `when` for manual control: `true` reveals the element and `false` resets the entrance. `null` or `undefined` returns the control to the viewport, and a revealed element stays revealed. `when` does not show or hide content. With `when: false`, the element is transparent, but screen readers still read it, and the keyboard can focus its controls. To hide content, add the `hidden` attribute, or do not render it. `inert` does not hide the element. It only blocks focus, clicks and assistive technology. With `when: true`, the server still renders the element hidden, and the entrance plays after hydration.
+
+A component keeps its reveal when `as` changes. An attachment belongs to its element, so a new element, such as one in a `{#key}` block, starts a new reveal.
+
+The `onReveal` option runs with the element, or with the container for a cascade. It runs one time for each reveal, when the reveal starts, not when the entrance ends. It also runs when no entrance plays, such as with reduced motion or focus. After `when: false`, the next reveal runs it again. With reduced motion, `when: false` does not reset the reveal, so it does not run again. `Reveal` and `Cascade` also give `revealed` to the `children` snippet: `{#snippet children({ revealed })}`.
+
+To wait for the end of the entrance, use the `finished` promises of the animations of the element. The promise waits for each animation of the element, also your own animations. An animation that repeats forever never finishes, so use the promise on an element that has no other animations. For a cascade, use `getAnimations({ subtree: true })` on the container, because its children animate. It resolves at once when no entrance plays. It rejects when the entrance stops early, such as after `when: false` or an unmount. Catch the rejection, or the browser reports an unhandled rejection.
+
+```ts
+import { reveal } from "@awesome-reveal/svelte";
+
+export function entered(element: Element) {
+  Promise.all(element.getAnimations().map((animation) => animation.finished))
+    .then(() => element.classList.add("entered"))
+    .catch(() => {});
+}
+
+export const enter = reveal(() => ({ onReveal: entered }));
+```
+
+In the consumer project, check the build, `svelte-check`, the visibility before the reveal, reduced motion and the teardown.

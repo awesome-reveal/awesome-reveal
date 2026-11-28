@@ -1,6 +1,6 @@
 # awesome-reveal
 
-Reveal-on-scroll animations for React, Vue, Astro and plain JavaScript. Content fades and slides in when it enters the viewport. Visit [awesome-reveal.dev](https://awesome-reveal.dev).
+Reveal-on-scroll animations for React, Vue, Svelte, Astro and plain JavaScript. Content fades and slides in when it enters the viewport. Visit [awesome-reveal.dev](https://awesome-reveal.dev).
 
 [![CI](https://github.com/awesome-reveal/awesome-reveal/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/awesome-reveal/awesome-reveal/actions/workflows/ci.yml)
 [![npm version](https://badgen.net/npm/v/@awesome-reveal/core)](https://www.npmjs.com/package/@awesome-reveal/core)
@@ -20,13 +20,14 @@ Reveal-on-scroll animations for React, Vue, Astro and plain JavaScript. Content 
 
 Install the package for your framework. Each README documents its API.
 
-| Framework        | Package                                                 | Version                                                                                                       |
-| ---------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| React            | [`@awesome-reveal/react`](packages/react)               | [![npm](https://badgen.net/npm/v/@awesome-reveal/react)](https://www.npmjs.com/package/@awesome-reveal/react) |
-| Vue              | [`@awesome-reveal/vue`](packages/vue)                   | [![npm](https://badgen.net/npm/v/@awesome-reveal/vue)](https://www.npmjs.com/package/@awesome-reveal/vue)     |
-| Astro            | [`@awesome-reveal/astro`](packages/astro)               | [![npm](https://badgen.net/npm/v/@awesome-reveal/astro)](https://www.npmjs.com/package/@awesome-reveal/astro) |
-| JavaScript       | [`@awesome-reveal/core`](packages/core)                 | [![npm](https://badgen.net/npm/v/@awesome-reveal/core)](https://www.npmjs.com/package/@awesome-reveal/core)   |
-| React (v4 users) | [`react-awesome-reveal`](packages/react-awesome-reveal) | [![npm](https://badgen.net/npm/v/react-awesome-reveal)](https://www.npmjs.com/package/react-awesome-reveal)   |
+| Framework        | Package                                                 | Version                                                                                                         |
+| ---------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| React            | [`@awesome-reveal/react`](packages/react)               | [![npm](https://badgen.net/npm/v/@awesome-reveal/react)](https://www.npmjs.com/package/@awesome-reveal/react)   |
+| Vue              | [`@awesome-reveal/vue`](packages/vue)                   | [![npm](https://badgen.net/npm/v/@awesome-reveal/vue)](https://www.npmjs.com/package/@awesome-reveal/vue)       |
+| Svelte           | [`@awesome-reveal/svelte`](packages/svelte)             | [![npm](https://badgen.net/npm/v/@awesome-reveal/svelte)](https://www.npmjs.com/package/@awesome-reveal/svelte) |
+| Astro            | [`@awesome-reveal/astro`](packages/astro)               | [![npm](https://badgen.net/npm/v/@awesome-reveal/astro)](https://www.npmjs.com/package/@awesome-reveal/astro)   |
+| JavaScript       | [`@awesome-reveal/core`](packages/core)                 | [![npm](https://badgen.net/npm/v/@awesome-reveal/core)](https://www.npmjs.com/package/@awesome-reveal/core)     |
+| React (v4 users) | [`react-awesome-reveal`](packages/react-awesome-reveal) | [![npm](https://badgen.net/npm/v/react-awesome-reveal)](https://www.npmjs.com/package/react-awesome-reveal)     |
 
 Version 5 of `react-awesome-reveal` re-exports `@awesome-reveal/react` for v4 users. To upgrade, read [Migrate from v4](packages/react#migrate-from-v4).
 
@@ -53,6 +54,17 @@ import { Reveal, vReveal } from "@awesome-reveal/vue";
 </template>
 ```
 
+Svelte:
+
+```svelte
+<script lang="ts">
+  import { Reveal, reveal } from "@awesome-reveal/svelte";
+</script>
+
+<Reveal from="left">Hello</Reveal>
+<p {@attach reveal(() => ({ from: { opacity: 0 } }))}>Fade only</p>
+```
+
 Astro:
 
 ```astro
@@ -76,7 +88,7 @@ In most setups, you do not import a stylesheet. The README of each package gives
 
 ## Examples
 
-The [`examples`](examples) folder has a small app for React, Vue, Astro and Next.js.
+The [`examples`](examples) folder has a small app for React, Vue, Svelte, Astro and Next.js.
 
 ## Browser support
 

@@ -41,6 +41,11 @@ updates:
           - "@vue/*"
           - vue-tsc
           - "@vitejs/plugin-vue"
+      svelte:
+        patterns:
+          - svelte
+          - "@sveltejs/*"
+          - svelte-check
       vitest:
         patterns:
           - vitest

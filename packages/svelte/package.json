@@ -1,0 +1,94 @@
+{
+  "name": "@awesome-reveal/svelte",
+  "version": "1.0.0-rc.0",
+  "description": "Reveal-on-scroll animations for Svelte, built on the Web Animations API and IntersectionObserver.",
+  "keywords": [
+    "animate-on-scroll",
+    "animation",
+    "attachment",
+    "fade-in",
+    "intersection-observer",
+    "reveal",
+    "reveal-on-scroll",
+    "scroll",
+    "scroll-animation",
+    "scroll-reveal",
+    "svelte",
+    "svelte5",
+    "sveltekit",
+    "typescript",
+    "viewport",
+    "waapi",
+    "web-animations"
+  ],
+  "homepage": "https://awesome-reveal.dev",
+  "bugs": {
+    "url": "https://github.com/awesome-reveal/awesome-reveal/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Dennis Morello",
+    "email": "dennismorello@gmail.com",
+    "url": "https://morello.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/awesome-reveal/awesome-reveal.git",
+    "directory": "packages/svelte"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/morellodev"
+    }
+  ],
+  "files": [
+    "dist",
+    "skills"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "reveal.css": [
+        "dist/reveal.css.d.ts"
+      ]
+    }
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js"
+    },
+    "./reveal.css": {
+      "types": "./dist/reveal.css.d.ts",
+      "default": "./dist/reveal.css"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "svelte-check --tsconfig tsconfig.json --fail-on-warnings && svelte-package -i src -o dist && node scripts/declarations.js",
+    "check:package": "tsc -p test/package && publint --strict && attw --pack . --ignore-rules cjs-resolves-to-esm"
+  },
+  "dependencies": {
+    "@awesome-reveal/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@sveltejs/package": "catalog:",
+    "svelte": "catalog:",
+    "svelte-check": "catalog:",
+    "vitest-browser-svelte": "catalog:"
+  },
+  "peerDependencies": {
+    "svelte": "^5.46.4"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}

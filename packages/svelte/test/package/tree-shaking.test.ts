@@ -1,0 +1,27 @@
+import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { bundleFixture } from "@awesome-reveal/test-utils/bundle";
+
+const bundle = (fixture: string) =>
+  bundleFixture(new URL(`fixtures/${fixture}`, import.meta.url), {
+    external: ["svelte", /^svelte\//],
+    plugins: [svelte()],
+  });
+
+describe("consumer bundle", () => {
+  it("keeps only the modules and exports that it imports", async () => {
+    const { keptExports, bytes, css } = await bundle("reveal-only.js");
+
+    expect(keptExports["core/dist/adapter.js"]).toContain("createReveal");
+    expect(css).toBeGreaterThan(0);
+    expect(bytes + css).toBeLessThan(6100);
+  });
+
+  it("keeps no Reveal component for the attachment alone", async () => {
+    const { keptExports, bytes, css } = await bundle("attachment-only.js");
+
+    expect(keptExports["core/dist/adapter.js"]).toContain("createReveal");
+    expect(css).toBeGreaterThan(0);
+    expect(bytes + css).toBeLessThan(5000);
+    expect(keptExports).not.toHaveProperty("svelte/dist/Reveal.svelte");
+  });
+});

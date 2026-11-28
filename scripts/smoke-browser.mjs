@@ -8,6 +8,7 @@ import { chromium } from "playwright";
 
 const servers = {
   vite: (port) => ["vite", "preview", "--port", port, "--strictPort", "--host", "127.0.0.1"],
+  "vite-dev": (port) => ["vite", "dev", "--port", port, "--strictPort", "--host", "127.0.0.1"],
   // In an AI agent session, Astro 7 runs the preview in the background, and kill() does not reach it.
   astro: (port) => ["astro", "preview", "--port", port, "--host", "127.0.0.1", "--ignore-lock"],
   next: (port) => ["next", "start", "-p", port, "-H", "127.0.0.1"],
@@ -37,6 +38,19 @@ async function waitFor(url, server) {
 const expect = (condition, message) => {
   if (!condition) throw new Error(message);
 };
+
+// The server HTML must load reveal.css, because the content flashes until the scripts load it.
+async function checkServerCss(browser, url) {
+  const page = await browser.newPage();
+  await page.route(/\.m?js(\?|$)/, (route) => route.abort());
+  await page.goto(url);
+  const hidden = page.locator('[data-awesome-reveal="hidden"]').first();
+  expect(
+    (await hidden.evaluate((element) => getComputedStyle(element).opacity)) === "0",
+    `${url} shows its hidden markup before the scripts load`,
+  );
+  await page.close();
+}
 
 async function checkBrowser(browser, base, more) {
   const page = await browser.newPage({ viewport: { width: 800, height: 600 } });
@@ -84,6 +98,7 @@ export async function verifyInBrowser(cwd, server, { paths = [], more } = {}) {
           (await response.text()).includes('data-awesome-reveal="hidden"'),
           `${path} has no hidden element in the HTML`,
         );
+        await checkServerCss(browser, base + path);
       }),
     );
     await checkBrowser(browser, base, more);

@@ -12,6 +12,7 @@
       "@awesome-reveal/core": ["./packages/core/src/index.ts"],
       "@awesome-reveal/core/adapter": ["./packages/core/src/adapter.ts"],
       "@awesome-reveal/react": ["./packages/react/src/index.ts"],
+      "@awesome-reveal/svelte": ["./packages/svelte/src/index.ts"],
       "@awesome-reveal/test-utils/*": ["./packages/test-utils/src/*.ts"],
       "@awesome-reveal/vue": ["./packages/vue/src/index.ts"]
     },

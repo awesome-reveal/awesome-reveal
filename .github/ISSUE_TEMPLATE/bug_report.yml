@@ -14,6 +14,7 @@ body:
         - "@awesome-reveal/astro"
         - "@awesome-reveal/react"
         - "@awesome-reveal/vue"
+        - "@awesome-reveal/svelte"
         - "@awesome-reveal/core"
         - react-awesome-reveal
     validations:
@@ -42,7 +43,7 @@ body:
     id: reproduction
     attributes:
       label: Reproduction
-      description: A StackBlitz link that shows the bug. Start from a template, such as [vite.new/react-ts](https://vite.new/react-ts), [vite.new/vue-ts](https://vite.new/vue-ts) or [astro.new/minimal](https://astro.new/minimal), and add the package.
+      description: A StackBlitz link that shows the bug. Start from a template, such as [vite.new/react-ts](https://vite.new/react-ts), [vite.new/vue-ts](https://vite.new/vue-ts), [vite.new/svelte-ts](https://vite.new/svelte-ts) or [astro.new/minimal](https://astro.new/minimal), and add the package.
       placeholder: "https://stackblitz.com/edit/..."
     validations:
       required: true

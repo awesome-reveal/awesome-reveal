@@ -1,0 +1,29 @@
+/* The hold ends, so markup that no script attaches shows again. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  [data-awesome-reveal="hidden"],
+  [data-awesome-reveal="cascade"] > * {
+    animation: awesome-reveal-hold 5s !important;
+  }
+  /* A new duration keeps the start time, so a blur does not restart the hold. */
+  [data-awesome-reveal="hidden"]:focus-within,
+  [data-awesome-reveal="cascade"]:focus-within > * {
+    animation-duration: 0s !important;
+  }
+  [data-awesome-reveal="hidden"][data-awesome-reveal-attached],
+  [data-awesome-reveal="cascade"][data-awesome-reveal-attached] > * {
+    opacity: 0 !important;
+  }
+}
+/* A separate query, so browsers without the `scripting` feature still hide. */
+@media (scripting: none) {
+  [data-awesome-reveal="hidden"],
+  [data-awesome-reveal="cascade"] > * {
+    animation: none !important;
+  }
+}
+@keyframes awesome-reveal-hold {
+  from,
+  to {
+    opacity: 0;
+  }
+}

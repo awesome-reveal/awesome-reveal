@@ -18,24 +18,20 @@
     "packages/react-awesome-reveal": {
       "component": "react-awesome-reveal"
     },
+    "packages/svelte": {
+      "component": "@awesome-reveal/svelte",
+      "prerelease": true,
+      "versioning": "prerelease",
+      "prerelease-type": "rc",
+      "release-as": "1.0.0-rc.0"
+    },
     "packages/vue": {
       "component": "@awesome-reveal/vue"
     }
   },
   "plugins": [
     {
-      "type": "node-workspace",
-      "merge": false
-    },
-    {
-      "type": "linked-versions",
-      "groupName": "awesome-reveal",
-      "components": [
-        "@awesome-reveal/astro",
-        "@awesome-reveal/core",
-        "@awesome-reveal/react",
-        "@awesome-reveal/vue"
-      ]
+      "type": "node-workspace"
     }
   ]
 }
