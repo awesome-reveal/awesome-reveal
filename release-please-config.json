@@ -24,18 +24,7 @@
   },
   "plugins": [
     {
-      "type": "node-workspace",
-      "merge": false
-    },
-    {
-      "type": "linked-versions",
-      "groupName": "awesome-reveal",
-      "components": [
-        "@awesome-reveal/astro",
-        "@awesome-reveal/core",
-        "@awesome-reveal/react",
-        "@awesome-reveal/vue"
-      ]
+      "type": "node-workspace"
     }
   ]
 }
