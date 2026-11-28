@@ -22,8 +22,8 @@
       "component": "@awesome-reveal/svelte",
       "prerelease": true,
       "versioning": "prerelease",
-      "prerelease-type": "next",
-      "release-as": "1.0.0-next.0"
+      "prerelease-type": "rc",
+      "release-as": "1.0.0-rc.0"
     },
     "packages/vue": {
       "component": "@awesome-reveal/vue"
