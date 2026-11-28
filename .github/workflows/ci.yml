@@ -95,6 +95,12 @@ jobs:
             package: "@awesome-reveal/vue"
             deps: vue@3.5.0
             projects: --project vue:unit --project vue:ssr --project vue:browser
+          - name: Svelte 5.46.4
+            package: "@awesome-reveal/svelte"
+            deps: svelte@5.46.4
+            # The root Svelte plugin compiles the tests, and its compiler must match the runtime.
+            root-deps: svelte@5.46.4
+            projects: --project svelte:unit --project svelte:ssr --project svelte:browser
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -114,9 +120,14 @@ jobs:
         env:
           PACKAGE: ${{ matrix.package }}
           DEPS: ${{ matrix.deps }}
+          ROOT_DEPS: ${{ matrix.root-deps }}
         run: |
           read -r -a deps <<< "$DEPS"
           pnpm --filter "$PACKAGE" add -D "${deps[@]}"
+          if [ -n "$ROOT_DEPS" ]; then
+            read -r -a root_deps <<< "$ROOT_DEPS"
+            pnpm add -D -w "${root_deps[@]}"
+          fi
 
       - name: Test
         env:
@@ -182,6 +193,14 @@ jobs:
           - name: Vue 3
             case: vue
             deps: vue@3 @vitejs/plugin-vue vue-tsc
+          - name: Svelte 5.46.4
+            case: svelte
+            deps: svelte@5.46.4 @sveltejs/vite-plugin-svelte svelte-check
+          - name: Svelte 5
+            case: svelte
+            deps: svelte@5 @sveltejs/vite-plugin-svelte svelte-check
+          - name: SvelteKit 2
+            case: sveltekit
           - name: Astro 6.0.0
             case: astro
             deps: astro@6.0.0 @astrojs/check typescript@5.9
@@ -190,6 +209,8 @@ jobs:
             deps: astro@7 @astrojs/check typescript@5.9
           - name: Astro 7 + React island
             case: astro-island
+          - name: Astro 7 + Svelte island
+            case: astro-svelte-island
           - name: Next 16
             case: next
           - name: Next 15
@@ -252,6 +273,10 @@ jobs:
 
       - name: Check formatting
         run: pnpm format:check
+
+      # tsc cannot read .svelte files.
+      - name: Type-check the Svelte tests
+        run: pnpm --filter @awesome-reveal/svelte exec svelte-check --tsconfig test/tsconfig.json --fail-on-warnings
 
       # tsc cannot read .astro files. The example tsconfig includes the components of packages/astro.
       - name: Type-check the Astro components

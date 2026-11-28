@@ -2,18 +2,20 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 
-import { build, type Rolldown } from "vite";
+import { build, type PluginOption, type Rolldown } from "vite";
 
 interface BundleOptions {
   /** A package that resolves through its "exports" map, as consumers do. */
   resolvePackage?: string;
-  external?: string[];
+  external?: (string | RegExp)[];
+  /** The compiler plugins of a framework that ships component files, such as Svelte. */
+  plugins?: PluginOption[];
 }
 
 /** Bundles a fixture of `test/package/fixtures` for production, and gives the exports that the bundle keeps for each `<package>/dist/<file>`, and the minified bytes of the JavaScript and of the CSS. */
 export async function bundleFixture(
   fixture: URL,
-  { resolvePackage, external }: BundleOptions = {},
+  { resolvePackage, external, plugins }: BundleOptions = {},
 ) {
   const alias = resolvePackage
     ? [
@@ -27,6 +29,7 @@ export async function bundleFixture(
     configFile: false,
     logLevel: "silent",
     root: fileURLToPath(new URL("../../../", fixture)),
+    plugins,
     resolve: { alias },
     build: {
       write: false,

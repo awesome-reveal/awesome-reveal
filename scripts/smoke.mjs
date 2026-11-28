@@ -1,6 +1,6 @@
 // Installs the packed tarballs into a clean project outside the workspace, then builds and type-checks it.
 // The cases with a browser check load the build in Chromium.
-// Usage: node scripts/smoke.mjs <core|react|compat|vue|astro|astro-island|next|next-pages> [dependency@version ...]
+// Usage: node scripts/smoke.mjs <core|react|compat|vue|svelte|sveltekit|astro|astro-island|astro-svelte-island|next|next-pages> [dependency@version ...]
 // Build the packages first (pnpm build). Extra arguments replace the default framework dependencies.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -176,6 +176,81 @@ ${hiddenCheck("await renderToString(createSSRApp(App))")}
       "src/env.d.ts": `/// <reference types="vite/client" />`,
     },
   },
+  svelte: {
+    packages: ["core", "svelte"],
+    deps: ["svelte@5", "@sveltejs/vite-plugin-svelte", "svelte-check"],
+    plugins: `import { svelte } from "@sveltejs/vite-plugin-svelte";`,
+    pluginCall: "svelte()",
+    check: ["svelte-check", "--fail-on-warnings"],
+    typescript: true,
+    verify: browse(),
+    files: {
+      "src/App.svelte": `
+<script lang="ts">
+  import { Cascade, Reveal, cascade, reveal } from "@awesome-reveal/svelte";
+</script>
+
+<Reveal id="top" from="left" onReveal={() => {}}>Component</Reveal>
+<Reveal from="top">
+  {#snippet children({ revealed })}{revealed}{/snippet}
+</Reveal>
+<Cascade as="ul"><li>One</li><li>Two</li></Cascade>
+<p {@attach reveal(() => ({ from: { opacity: 0 }, onReveal: () => {} }))}>Attachment</p>
+<ul {@attach cascade(() => ({ interval: 120 }))}><li>One</li></ul>
+<div style="height: 200vh"></div>
+<Reveal id="below" from="bottom">Below</Reveal>
+`,
+      "src/main.ts": `
+import { mount } from "svelte";
+import App from "./App.svelte";
+
+mount(App, { target: document.body });
+`,
+      "src/ssr.ts": `
+import { render } from "svelte/server";
+import App from "./App.svelte";
+
+${hiddenCheck("render(App).body")}
+`,
+      // tsc reads the package declarations in each module resolution, which svelte-check does not vary.
+      "src/types.ts": `
+import { Reveal, reveal, type RevealProps } from "@awesome-reveal/svelte";
+import type { ComponentProps } from "svelte";
+
+export const props: ComponentProps<typeof Reveal> = { as: "section", duration: 300 };
+// @ts-expect-error duration is a number
+export const wrong: ComponentProps<typeof Reveal> = { duration: "slow" };
+export const attachment = reveal(() => ({ when: true }) satisfies RevealProps);
+`,
+    },
+  },
+  // SvelteKit collects the CSS of a page from the server module graph, in dev and in the build.
+  sveltekit: {
+    packages: ["core", "svelte"],
+    deps: ["@sveltejs/kit@2", "@sveltejs/vite-plugin-svelte", "svelte@5", "vite@^8.3.4"],
+    scaffold: false,
+    build: ["vite", "build"],
+    async verify(app) {
+      await browse({ paths: ["/"] })(app, "vite");
+      await browse({ paths: ["/"] })(app, "vite-dev");
+    },
+    files: {
+      "svelte.config.js": "export default {};\n",
+      "vite.config.js": `import { sveltekit } from "@sveltejs/kit/vite";\nexport default { plugins: [sveltekit()] };\n`,
+      "src/app.html": `<!doctype html>\n<html lang="en"><head>%sveltekit.head%</head><body><div style="display: contents">%sveltekit.body%</div></body></html>\n`,
+      "src/routes/+page.svelte": `
+<script>
+  import { Cascade, Reveal, reveal } from "@awesome-reveal/svelte";
+</script>
+
+<Reveal id="top" from="left">Top</Reveal>
+<Cascade as="ul"><li>One</li><li>Two</li></Cascade>
+<p {@attach reveal()}>Attachment</p>
+<div style="height: 200vh"></div>
+<Reveal id="below" from="bottom">Below</Reveal>
+`,
+    },
+  },
   next: {
     packages: ["core", "react", "react-awesome-reveal"],
     deps: ["next@16", "react@19", "react-dom@19", "@types/react@19", "@types/react-dom@19"],
@@ -319,6 +394,37 @@ import Island from "../components/Island.jsx";
   },
   // Webpack rejects global CSS that a module in node_modules imports, unless Next.js transpiles the package.
   // Turbopack needs no transpilePackages, so the build uses webpack.
+  // The Svelte modules import the stylesheet in the server build too, so the page needs no import.
+  "astro-svelte-island": {
+    packages: ["core", "svelte"],
+    deps: ["astro@7", "@astrojs/svelte", "svelte@5"],
+    scaffold: false,
+    build: ["astro", "build"],
+    verify: browse({ paths: ["/"] }),
+    files: {
+      "astro.config.mjs": `import { defineConfig } from "astro/config";\nimport svelte from "@astrojs/svelte";\nexport default defineConfig({ integrations: [svelte()] });\n`,
+      "src/components/Island.svelte": `
+<script>
+  import { Reveal } from "@awesome-reveal/svelte";
+</script>
+
+<Reveal id="top" from="left">Top</Reveal>
+<div style="height: 200vh"></div>
+<Reveal id="below" from="bottom">Below</Reveal>
+`,
+      "src/pages/index.astro": `
+---
+import Island from "../components/Island.svelte";
+---
+
+<html lang="en">
+  <body>
+    <Island client:load />
+  </body>
+</html>
+`,
+    },
+  },
   "next-pages": {
     packages: ["core", "react"],
     deps: ["next@16", "react@19", "react-dom@19", "@types/react@19", "@types/react-dom@19"],

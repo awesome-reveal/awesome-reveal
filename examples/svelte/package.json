@@ -1,0 +1,19 @@
+{
+  "name": "example-svelte",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "svelte-check --fail-on-warnings && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@awesome-reveal/svelte": "workspace:*",
+    "svelte": "catalog:"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.3.2",
+    "svelte-check": "catalog:",
+    "vite": "catalog:"
+  }
+}

@@ -17,6 +17,7 @@
     "@arethetypeswrong/cli": "^0.18.5",
     "@commitlint/cli": "21.2.4",
     "@commitlint/config-conventional": "21.2.4",
+    "@sveltejs/vite-plugin-svelte": "^7.3.2",
     "@types/node": "^24.19.2",
     "@vitejs/plugin-vue": "^6.0.11",
     "@vitest/browser-playwright": "^5.0.5",

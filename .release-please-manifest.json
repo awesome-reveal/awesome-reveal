@@ -3,5 +3,6 @@
   "packages/core": "1.0.0",
   "packages/react": "1.0.0",
   "packages/react-awesome-reveal": "5.0.0",
+  "packages/svelte": "0.0.0",
   "packages/vue": "1.0.0"
 }
