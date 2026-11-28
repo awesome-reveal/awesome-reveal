@@ -23,13 +23,43 @@ import {
 
 type WithoutCallback<T> = T extends unknown ? Omit<T, "onReveal"> : never;
 
+// The server renders no children in a void tag, so the hydration of the slot fails.
+type VoidTag =
+  | "area"
+  | "base"
+  | "br"
+  | "col"
+  | "embed"
+  | "hr"
+  | "img"
+  | "input"
+  | "link"
+  | "meta"
+  | "source"
+  | "track"
+  | "wbr";
+
+// The parser reads the content of these tags as text or as a template fragment, or it drops the tag in the body.
+// The hydration of the slot then fails, and for `template` it throws.
+type UnhydratableTag =
+  | "body"
+  | "head"
+  | "html"
+  | "iframe"
+  | "noscript"
+  | "script"
+  | "style"
+  | "template"
+  | "textarea"
+  | "title";
+
 /** Configures the reveal and the element rendered around its slot. */
 export type RevealProps = WithoutCallback<RevealOptions> & {
   /**
-   * The tag of the rendered element.
+   * The tag of the rendered element: an HTML tag that can contain the slot, or a custom element.
    * @default "div"
    */
-  as?: string;
+  as?: Exclude<keyof HTMLElementTagNameMap, VoidTag | UnhydratableTag> | `${string}-${string}`;
 };
 
 /** Configures the cascade and the element rendered around its slot. */
@@ -88,7 +118,7 @@ function defineReveal(
     {
       name,
       props: {
-        as: String,
+        as: String as PropType<RevealProps["as"]>,
         keyframes: Array as PropType<RevealOptions["keyframes"]>,
         from: [String, Object] as PropType<RevealOptions["from"]>,
         duration: Number,

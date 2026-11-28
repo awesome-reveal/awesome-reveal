@@ -35,4 +35,9 @@ import { Cascade, Reveal, vCascade, vReveal } from "../../src";
     <!-- @vue-expect-error The slot prop is a boolean. -->
     {{ revealed.toUpperCase() }}
   </Cascade>
+  <Reveal as="my-card" />
+  <!-- @vue-expect-error The parser reads the content of a textarea as text. -->
+  <Reveal as="textarea" />
+  <!-- @vue-expect-error A void tag has no children. -->
+  <Cascade as="img" />
 </template>
