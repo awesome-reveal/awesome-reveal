@@ -20,6 +20,20 @@ type VoidTag =
   | "track"
   | "wbr";
 
+// The parser reads the content of these tags as text or as a template fragment, or it drops the tag in the body.
+// The hydration markers of the children then break.
+type UnhydratableTag =
+  | "body"
+  | "head"
+  | "html"
+  | "iframe"
+  | "noscript"
+  | "script"
+  | "style"
+  | "template"
+  | "textarea"
+  | "title";
+
 /** Configures the reveal and the element rendered around its children. Other props become global attributes of the element. */
 export type RevealProps = RevealOptions &
   Attributes & {
@@ -27,7 +41,7 @@ export type RevealProps = RevealOptions &
      * The tag of the rendered element.
      * @default "div"
      */
-    as?: Exclude<keyof HTMLElementTagNameMap, VoidTag>;
+    as?: Exclude<keyof HTMLElementTagNameMap, VoidTag | UnhydratableTag>;
     children?: Snippet<[{ revealed: boolean }]>;
   };
 

@@ -27,6 +27,17 @@ describe("RevealProps", () => {
     expectTypeOf<{ as: "img" }>().not.toExtend<RevealProps>();
   });
 
+  it("rejects a tag whose children cannot hydrate", () => {
+    expectTypeOf<{ as: "textarea" }>().not.toExtend<RevealProps>();
+    expectTypeOf<{ as: "title" }>().not.toExtend<RevealProps>();
+    expectTypeOf<{ as: "template" }>().not.toExtend<RevealProps>();
+    expectTypeOf<{ as: "body" }>().not.toExtend<CascadeProps>();
+  });
+
+  it("accepts a table tag", () => {
+    expectTypeOf<{ as: "tbody" }>().toExtend<CascadeProps>();
+  });
+
   it("gives interval to the cascade", () => {
     expectTypeOf<{ interval: 100 }>().toExtend<CascadeProps>();
   });
