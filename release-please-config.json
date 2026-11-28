@@ -18,6 +18,9 @@
     "packages/react-awesome-reveal": {
       "component": "react-awesome-reveal"
     },
+    "packages/svelte": {
+      "component": "@awesome-reveal/svelte"
+    },
     "packages/vue": {
       "component": "@awesome-reveal/vue"
     }
@@ -34,6 +37,7 @@
         "@awesome-reveal/astro",
         "@awesome-reveal/core",
         "@awesome-reveal/react",
+        "@awesome-reveal/svelte",
         "@awesome-reveal/vue"
       ]
     }

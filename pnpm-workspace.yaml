@@ -8,15 +8,19 @@ allowBuilds:
   sharp: false
 
 catalog:
+  "@sveltejs/package": ^3.0.3
   "@types/react": ^19.3.0
   "@types/react-dom": ^19.3.0
   astro: ^7.4.7
   next: ^16.4.5
   react: ^19.3.1
   react-dom: ^19.3.1
+  svelte: ^5.59.2
+  svelte-check: ^4.7.8
   typescript: ^6.0.3
   vite: ^8.3.5
   vitest-browser-react: ^2.3.0
+  vitest-browser-svelte: ^3.1.0
   vitest-browser-vue: ^3.1.0
   vue: ^3.5.46
   vue-tsc: ^3.3.14

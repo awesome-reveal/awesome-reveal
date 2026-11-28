@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url";
 
 import { playwright } from "@vitest/browser-playwright";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
 import vue from "@vitejs/plugin-vue";
 import { coverageConfigDefaults, defineConfig } from "vitest/config";
 
@@ -66,7 +67,7 @@ export default defineConfig({
       reporter: [...coverageConfigDefaults.reporter, "json-summary"],
       // Each package must reach the threshold, so that a weak package cannot hide in the total.
       thresholds: Object.fromEntries(
-        ["astro", "core", "react", "vue"].map((name) => [
+        ["astro", "core", "react", "svelte", "vue"].map((name) => [
           `packages/${name}/src/**`,
           coverageThreshold,
         ]),
@@ -208,6 +209,65 @@ export default defineConfig({
         resolve: { alias: testUtils },
         test: {
           name: "vue:package",
+          environment: "node",
+          setupFiles: ["./test/setup/console.ts"],
+          include: ["test/package/**/*.test.ts"],
+        },
+      },
+      {
+        root: "packages/svelte",
+        plugins: [svelte()],
+        resolve: sources,
+        test: {
+          name: "svelte:unit",
+          environment: "node",
+          setupFiles: ["./test/setup/console.ts"],
+          include: ["test/**/*.test.ts"],
+          exclude: ["test/package/**", "test/browser/**", "test/ssr.test.ts"],
+          typecheck: {
+            enabled: true,
+            tsconfig: "./test/tsconfig.json",
+            include: ["test/types/**/*.test-d.ts"],
+          },
+        },
+      },
+      {
+        root: "packages/svelte",
+        plugins: [svelte()],
+        resolve: sources,
+        // Vite reloads the page in the middle of a run when it finds a new dependency to optimize.
+        optimizeDeps: {
+          include: [
+            "svelte",
+            "svelte/internal/client",
+            "svelte/attachments",
+            "vitest-browser-svelte",
+          ],
+        },
+        test: {
+          name: "svelte:browser",
+          include: ["test/browser/**/*.test.ts"],
+          ...browserTest(),
+          setupFiles: ["./test/setup/console.ts", "./test/setup/browser.ts"],
+        },
+      },
+      {
+        root: "packages/svelte",
+        plugins: [svelte()],
+        resolve: sources,
+        test: {
+          name: "svelte:ssr",
+          environment: "node",
+          setupFiles: ["./test/setup/console.ts"],
+          include: ["test/ssr.test.ts"],
+        },
+      },
+      {
+        root: "packages/svelte",
+        plugins: [svelte()],
+        resolve: { alias: testUtils },
+        test: {
+          name: "svelte:package",
           environment: "node",
           setupFiles: ["./test/setup/console.ts"],
           include: ["test/package/**/*.test.ts"],
