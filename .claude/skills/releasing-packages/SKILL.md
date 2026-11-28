@@ -7,15 +7,15 @@ description: Releases the awesome-reveal packages with release-please and npm tr
 
 A push to `main` runs `.github/workflows/release.yml`. The `release-please` job opens or updates the release PR, "chore: release <branch>". When the release PR merges, the job creates the tags and the GitHub releases, and the `publish` job publishes to npm with OIDC. The `publish` job gives each released package the `latest` dist-tag. A prerelease gets `next` instead when the package already has a stable version on `latest`. So a package with no stable version gets its prereleases on `latest`, and a plain install gets them.
 
-Do not run `npm publish`, `npm trust` or `npm dist-tag` yourself. The agent shell cannot do the npm web 2FA, so these commands fail with `EOTP`. Give the command to the user, with `--otp=<code>`, to run as `! <command>`.
+Do not run `pnpm publish`, `pnpm dist-tag`, `pnpm unpublish` or `npm trust` yourself. The agent shell cannot do the npm web 2FA, so these commands fail with `EOTP`. Give the command to the user, with `--otp=<code>`, to run as `! <command>`. Use pnpm for the registry commands. pnpm has no `trust` command, so the trusted publisher needs npm and a valid `npm login`. The root `package.json` sets `devEngines.packageManager` to pnpm, so npm commands fail in the repo with `EBADDEVENGINES`.
 
 ## Merge a release PR
 
 1. Read the PR diff. Check the versions in `.release-please-manifest.json` and the new `CHANGELOG.md` entries.
-2. Make sure that each public package exists on npm: `npm view <package> version`. List the public packages with `pnpm -r ls --json --depth -1 | jq -r '.[] | select(.private | not) | .name'`. The `publish` job has no npm token, so a package that it released before has a trusted publisher. A package with no version or with `0.0.0-placeholder` is new. Do "Publish a new package" for it first: one missing publisher fails the job.
+2. Make sure that each public package exists on npm: `pnpm view <package> version`. List the public packages with `pnpm -r ls --json --depth -1 | jq -r '.[] | select(.private | not) | .name'`. The `publish` job has no npm token, so a package that it released before has a trusted publisher. A package with no version or with `0.0.0-placeholder` is new. Do "Publish a new package" for it first: one missing publisher fails the job.
 3. Wait for the CI checks of the PR, then squash-merge it: `gh pr checks <number> --watch --fail-fast >/dev/null && gh pr merge <number> --squash --delete-branch`. The watch prints the full table at each refresh, and its exit status is enough. CI runs on the PR when the secret `RELEASE_PLEASE_TOKEN` is set. With `GITHUB_TOKEN` alone, the PR has no CI runs.
 4. Watch the run in the background: `gh run watch <run-id> --exit-status`. The `publish` job waits until npm shows each version, and this can take 20 minutes. Find the ID with `gh run list --workflow release.yml --branch <branch> --limit 1`.
-5. Check the dist-tags: `npm view <package> dist-tags --prefer-online`. A green run already proves that npm shows each version.
+5. Check the dist-tags: `pnpm dist-tag ls <package>`. A green run already proves that npm shows each version.
 
 If the `publish` job fails because of an external cause, such as the trusted publisher, the environment or an npm outage:
 
@@ -70,7 +70,7 @@ npm can add a trusted publisher only to a package that exists.
    }
    ```
 
-2. Ask the user to publish it: `npm publish --tag placeholder --otp=<code>` in that directory. npm refuses a prerelease without `--tag`. Use a prerelease placeholder: a stable placeholder keeps `latest`, so `pnpm add <package>` installs the empty placeholder.
+2. Ask the user to publish it: `pnpm publish --tag placeholder --no-git-checks --otp=<code>` in that directory. The directory is not a git repo, so the publish needs `--no-git-checks`. Use a prerelease placeholder: a stable placeholder keeps `latest`, so `pnpm add <package>` installs the empty placeholder.
 3. Just before you merge the release PR, ask the user to add the trusted publisher. This needs npm 11.15 or later:
 
    ```sh
@@ -79,7 +79,7 @@ npm can add a trusted publisher only to a package that exists.
    ```
 
 4. Merge the release PR within 48 hours. A new trusted publisher expires 48 hours after you create it, unless a publish uses it first. To replace an expired one, revoke it with `npm trust revoke --id <id> <package>`, then create it again.
-5. After the first release, ask the user to remove the placeholder: `npm dist-tag rm <package> placeholder --otp=<code>`, then `npm unpublish <package>@0.0.0-placeholder --otp=<code>`. After 72 hours, npm permits the unpublish only when all of these conditions are true:
+5. After the first release, ask the user to remove the placeholder: `pnpm dist-tag rm <package> placeholder --otp=<code>`, then `pnpm unpublish <package>@0.0.0-placeholder --otp=<code>`. After 72 hours, npm permits the unpublish only when all of these conditions are true:
    - No other package depends on the package.
    - The package had fewer than 300 downloads in the last week.
    - The package has one maintainer.
